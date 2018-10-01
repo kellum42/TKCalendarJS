@@ -1,0 +1,23 @@
+@media only screen {
+	header {
+		
+	}
+	.months-wrapper .month {
+		width: 15%;
+		margin: 0px 10px;
+		display:inline-block;
+		text-decoration:none;
+		color:black;
+	}
+	.months-wrapper .days span {
+		display:inline-block;
+		width: 14.286%;
+		float:left;
+		text-align:center;
+		padding: 5px 0px;
+	}
+	.months-wrapper .days span.today {
+		background:red;
+		color:white;
+	}
+}
