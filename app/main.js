@@ -1,24 +1,63 @@
 // Whenever the model changes, use profixy to update the ui
 
 function App(el) {
+	if (!el) {
+		throw "An element has to  be passed to instantiate.";
+		return;
+	}
+	
 	this._element = document.querySelector(el);
+	this._controllers = [];
+	this._stack = [];
 }
 
+/*
 App.prototype.addView = function(view){
 	this._view = view;
 }
+*/
 
+/*
 App.prototype.updateView = function(){
 	this._element.innerHTML = this._view.html();
 }
+*/
 
-App.prototype.zoomIntoMonth = function(){
+App.prototype.push = function(controller) {
 	
 }
 
+App.prototype.pop = function(){
+	
+}
+
+App.prototype.parseHash = function(segments){
+	// year, month, day
+	//	determine push or pop here
+	//	assign controllers here and simply pass to push/pop methods
+	if (!segments) { return; }
+	
+	if (segments.length < 2) {
+		// year
+		const year = (segments.length > 0) ? segments[0] : false;
+	
+	} else if (segments.length == 2) {
+		//	zoom to month
+		const year = segments[0];
+		const month = segments[1];
+		
+	} else if (segments.length > 2) {
+		//	month
+	}
+}
+
+
+function View(){
+	
+}
 
 function YearsCalendarView(years){
-	this._years = years;
+	this._years = years || 3;
 	this._html = "";
 	
 	const today = new Date();
@@ -64,6 +103,8 @@ YearsCalendarView.prototype.html = function(){
 	return html;
 }
 
+
+
 function Router(app) {
 	this._app = app;
 	this._routes = [];
@@ -78,10 +119,10 @@ Router.prototype.addRoute = function(name, url) {
 }
 
 Router.prototype.hashChange = function(){
-	console.log("route ran");
 	const hash = window.location.hash;
-    const route = this._routes.filter(route => hash.match(new RegExp(route.url)))[0];
-
+//     const route = this._routes.filter(route => hash.match(new RegExp(route.url)))[0];
+	
+	this._app.parseHash(hash.split("#")[1].split("/"));
 /*
     if (route) {
      	this.params = new RegExp(route.url).exec(hash);
@@ -96,7 +137,9 @@ Router.prototype.hashChange = function(){
 const app = new App('#calendar');
 const route = new Router(app);
 
-const yearsView = new YearsCalendarView(3);
+/*
+const yearsView = new YearsCalendarView();
 
 app.addView(yearsView);
 app.updateView();
+*/
