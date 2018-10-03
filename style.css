@@ -1,6 +1,27 @@
 @media only screen {
+	body {
+		overflow: hidden;
+	}
 	header {
-		
+		position: relative;
+	}
+	header #left-icon, header #right-icon {
+		position:absolute;
+		top: 50%;
+		transform:translateY(-50%);
+		left: 10px;
+	}
+	header #right-icon {
+		right: 10px;
+		left: auto;
+	}
+	#calendar {
+		height: calc(90vh - 0px);
+		position: absolute;
+		overflow-y: scroll;
+		top: 50px;
+		left: 10px;
+		right: 10px;
 	}
 	.year > .months-wrapper .month {
 		width: 15%;
@@ -19,6 +40,22 @@
 	.year > .months-wrapper .days span.today {
 		background:red;
 		color:white;
+	}
+	.weekday-list {
+		background: #cccccc;
+		padding: 5px 0px;
+		height: 20px;
+	}
+	.weekday-list > div {
+		width: 14%;
+		display:inline-block;
+		height: 100%;
+		text-align: center;
+	}
+	#months-expanded-container {
+		overflow: scroll;
+		margin: 0px;
+		height: calc(100% - 30px);
 	}
 	.month-expanded {
 		
@@ -42,5 +79,12 @@
 	.month-expanded > .days > a > p.today > span {
 		background: red;
 		color: white;
+		width: 25px;
+	    display: inline-block;
+	    text-align: center;
+	    height: 25px;
+	    border-radius: 50%;
+	    padding: 3px 0px 0px 0px;
+		box-sizing: border-box;
 	}
 }
