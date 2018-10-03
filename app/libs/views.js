@@ -50,7 +50,7 @@ class MonthsView extends View {
 	html(model){
 		//	scroll to selected month functionality
 		const year = model._year;
-		var html = "<div class='weekday-list'><div>S<span>unday</span></div><div>M<span>onday</span></div><div>T<span>uesday</span></div><div>W<span>ednesday</span></div><div>T<span>hursday</span></div><div>F<span>riday</span></div><div>S<span>aturday</span></div></div><div id='months-expanded-container'>";
+		var html = "<div class='weekday-list'><div style='color:grey'>S<span>unday</span></div><div>M<span>onday</span></div><div>T<span>uesday</span></div><div>W<span>ednesday</span></div><div>T<span>hursday</span></div><div>F<span>riday</span></div><div style='color:grey'>S<span>aturday</span></div></div><div id='months-expanded-container'>";
 		
 		for (var j=0;j<12;j++) {
 			const month = j;
@@ -66,9 +66,11 @@ class MonthsView extends View {
 			for(let k=0;k<42;k++) {
 				const day = (k + 1) - offset;
 				const l = (day > 0 && day <= numDays) ? day : "";
-				const todayClass = (year == model._currentYear && month === model._currentMonth && l == model._currentDay) ? "class='today'" : "" ;
+				const dayOfWeek = new Date(year, month, l).getDay();
+				const greyClass = (dayOfWeek === 0 || dayOfWeek === 6) ? " grey" : "";
+				const todayClass = (year == model._currentYear && month === model._currentMonth && l == model._currentDay) ? "today" : "" ;
 				const link = l ? "href='#" + year + "/" + month + "/" + l + "'" : "data-disabled";
-				html += "<a " + link + "><p " + todayClass + "><span>" + l + "</span></p><div class='events'></div></a>";
+				html += "<a " + link + "><p class=" + todayClass + greyClass + "><span>" + l + "</span></p><div class='events'></div></a>";
 			}
 			html += "<section style='clear:both'></section></div></div>";
 		}

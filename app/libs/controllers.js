@@ -15,6 +15,7 @@ class Controller {
 		el.scrollTop = this._model._scrollPosition || 0;
 		
 		this._leftIcon.innerHTML = "";
+		this._leftIcon.onclick = "";
 	}
 	
 	proxify(model) {
@@ -39,12 +40,15 @@ class MonthsController extends Controller {
 	
 	load(el){
 		super.load(el);
-		
+		const self = this;
 		//	scroll to month
-		const month = document.querySelectorAll(".month-expanded")[this._model._month];
+		const month = document.querySelectorAll(".month-expanded")[self._model._month];
 		const offsetY = month.offsetTop - (el.children[0].scrollHeight + 10) // month y pos - (month heading height + any extra padding)
 		el.children[1].scrollTop = offsetY || 0;
 		
-		this._leftIcon.innerHTML = "< " + this._model._year;
+		self._leftIcon.innerHTML = "< " + self._model._year;
+		self._leftIcon.onclick = function(){
+			window.location.hash = self._model._year;
+		}
 	}
 }

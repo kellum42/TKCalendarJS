@@ -2,6 +2,9 @@
 	body {
 		overflow: hidden;
 	}
+	.hover {
+		cursor: pointer;
+	}
 	header {
 		position: relative;
 	}
@@ -76,6 +79,9 @@
 		margin: 5px;
 		text-align: right;
 	}
+	.month-expanded > .days > a > p.grey > span {
+		color: grey;
+	}
 	.month-expanded > .days > a > p.today > span {
 		background: red;
 		color: white;
@@ -86,5 +92,17 @@
 	    border-radius: 50%;
 	    padding: 3px 0px 0px 0px;
 		box-sizing: border-box;
+	}
+	.month-expanded > .days > a > .events {
+		margin-top: 15px;
+	}
+	.month-expanded > .days > a > .events > .event {
+		padding: 3px 8px;
+		border-radius: 10px;
+		font-size: 13px;
+	}
+	.month-expanded > .days > a > .events > .event.purple {
+		background: purple;
+		color: white;
 	}
 }
