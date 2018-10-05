@@ -7,16 +7,9 @@ class App {
 		this._element = element;
 		this._stack = [];	// the current stack of controllers
 		
-		this.hashChange = this.hashChange.bind(this);
-		window.addEventListener('hashchange', this.hashChange);
-	    window.addEventListener('DOMContentLoaded', this.hashChange);
-	}
-	
-	hashChange(e){
-		const hash = window.location.hash;
-		const url = (hash.split("#")) ? hash.split("#")[1] : false;
-		const segments = url ? url.split("/") : false;
-		this.presentController(segments);
+		this.presentController = this.presentController.bind(this);
+		window.addEventListener('hashchange', this.presentController);
+	    window.addEventListener('DOMContentLoaded', this.presentController);
 	}
 	
 	push(controller){
@@ -70,10 +63,24 @@ class App {
 		controller.load(this._element);	
 	}
 	
-	presentController(segments){
+	presentController(){
 		var controller;
 		
+		const hash = window.location.hash;
+		
+		//	check for adding new event
+		if (hash.match(/\?ae/g)){
+			const view = new AddEventView();
+			const model = new Model();
+			const controller = new AddEventController("add-event", view, model);
+			this.push(controller);
+			return;	
+		}
+		
+		const url = (hash.split("#")) ? hash.split("#")[1] : false;
+		var segments = url ? url.split("/") : false;
 		segments = segments || [];
+		
 		
 		//	if stack length is zero, we know we are just starting out (the app was just loaded)
 		//	don't do any animations? just add controllers to the stack
@@ -100,12 +107,21 @@ class App {
 			if (year && month) {
 				model._year = year;
 				model._month = month;
-				const view = new MonthsView(year, month);
+				const view = new MonthsView();
 				controller = new MonthsController("months", view, model);
 			}
 		
 		} else {
 			//	days controller
+			const year = segments[0];
+			const month = segments[1];
+			const day = segments[2];
+			
+			model._year = year;
+			model._month = month;
+			model._day = day;
+			const view = new WeekView();
+			controller = new WeekController("week", view, model);
 		}
 		
 		if (controller) { this.push(controller); }

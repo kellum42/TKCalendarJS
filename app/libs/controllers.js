@@ -35,7 +35,6 @@ class Controller {
 class MonthsController extends Controller {
 	constructor(name, view, model){
 		super(name, view, model);
-		this._model = model;
 	}
 	
 	load(el){
@@ -50,5 +49,59 @@ class MonthsController extends Controller {
 		self._leftIcon.onclick = function(){
 			window.location.hash = self._model._year;
 		}
+	}
+}
+
+class WeekController extends Controller {
+	constructor(name, view, model) {
+		super(name, view, model);
+	}
+	
+	load(el) {
+		super.load(el);
+		const self = this;
+		
+		self._leftIcon.innerHTML = "< " + self._model.monthAbbreviation(self._model._month);
+		self._leftIcon.onclick = function(){
+			window.location.hash = self._model._year + "/" + self._model._month;
+		}
+		
+		self._rightIcon.innerHTML = "Add Event";
+		self._rightIcon.onclick = function(){
+			window.location.hash = window.location.hash + "?ae";
+		}
+		
+		var mySwiper = new Swiper ('.swiper-container', {
+			// Optional parameters
+			direction: 'horizontal',
+			loop: true,
+			
+			// If we need pagination
+			pagination: {
+			  el: '.swiper-pagination',
+			},
+			
+			// Navigation arrows
+			navigation: {
+			  nextEl: '.swiper-button-next',
+			  prevEl: '.swiper-button-prev',
+			},
+			
+			// And if we need scrollbar
+			scrollbar: {
+			  el: '.swiper-scrollbar',
+			},
+		})
+	}
+}
+
+class AddEventController extends Controller {
+	constructor(name, view, model) {
+		super(name, view, model);
+	}
+	
+	load(el) {
+		super.load(el);
+		const self = this;		
 	}
 }

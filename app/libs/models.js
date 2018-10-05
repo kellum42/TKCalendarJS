@@ -16,4 +16,8 @@ class Model {
 		const list = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 		return list[month] || "";
 	}
+	
+	viewWidth(){
+		return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+	}
 }

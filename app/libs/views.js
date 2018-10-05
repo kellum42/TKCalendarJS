@@ -78,3 +78,32 @@ class MonthsView extends View {
 		return html;
 	}
 }
+
+class WeekView extends View {
+	constructor(){
+		super();
+	}
+	
+	html(model) {
+		var html = "";
+		html = "<div class='swiper-container'>Swiper</div>";
+		return html;
+	}
+}
+
+class AddEventView extends View {
+	constructor(){
+		super();
+	}
+	
+	html(model) {
+		var html = "";
+		const desktopMode = model.viewWidth() > 1000;
+		if (desktopMode) {
+			
+		} else {
+			html += "<h1>mobile mode</h1>";
+		}
+		return html;
+	}
+}
