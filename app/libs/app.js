@@ -10,63 +10,85 @@ class App {
 		this.presentController = this.presentController.bind(this);
 		window.addEventListener('hashchange', this.presentController);
 	    window.addEventListener('DOMContentLoaded', this.presentController);
+	    
+	    this._monthsControllerName = "months-controller";
+	    this._yearsControllerName = "years-controller";
+	    this._weekControllerName = "week-controller";
 	}
 	
-	push(controller){
-		
-		//	cache the top offset of the currently showing controller
+	push(controller){		
 		const currentController = this._stack[this._stack.length - 1];
-		currentController._model._scrollPosition = this._element.scrollTop;
-		
+		currentController._view.hide(); // so it doesn't show under new controller
+				
 		this._stack.push(controller);
-		controller.load(this._element);	
+		controller.load();	
 	}
 	
 	pop(){	
 		if (this._stack.length < 2) { return; } // sanity check
 		
-	    this._stack.pop();
+		this._stack[this._stack.length - 1].dismiss(); // remove view from DOM
+	    this._stack.pop(); // remove from stack
+	    
 	    const controller = this._stack[this._stack.length - 1];
-	    controller.load(this._element);	
+	    controller.setHeaderFooterItems(); // reset header and footer icons
+	    controller._view.show();
 	}
 	
-	staticallyShowController(segments){
-		var controller;
-		
+	staticallyShowController(segments){		
 		const model = new Model();
 		
-		if (segments.length < 2) {
+		var controllers = [];
+		
+		if (segments.length >= 1 || segments.length >= 0) {
 			const year = parseInt(segments[0]) ||  (new Date).getFullYear(); // defaults to current year
 			const years = [year, year + 1, year + 2];
 			model._years = years;
-			controller = new Controller("years", new YearsView(), model);
-			this._stack.push(controller);
+			controllers.push(new Controller(this._element, this._yearsControllerName, new YearsView(), model));
 		}
 		
-		if (segments.length === 2) {
+		if (segments.length >= 2) {
 			const year = segments[0];
 			const month = segments[1];
 			
 			if (year && month) {
 				model._year = year;
 				model._month = month;
-				const view = new MonthsView(year, month);
-				controller = new MonthsController("months", view, model);				
-				this._stack.push(controller);
+				const view = new MonthsView();
+				controllers.push(new MonthsController(this._element, this._monthsControllerName, view, model));				
 			}
 		}
 		
 		if (segments.length > 2) {
 			//	days
+			const year = segments[0];
+			const month = segments[1];
+			const day = segments[2];
+			
+			model._year = year;
+			model._month = month;
+			model._day = day;
+			const view = new WeekView();
+			controllers.push(new WeekController(this._element, this._weekControllerName , view, model));
 		}
 		
-		controller.load(this._element);	
+		for (var i=0;i<controllers.length;i++) {
+			const controller = controllers[i];
+			controller.load();
+			this._stack.push(controller);
+				
+			if (i !== controllers.length - 1) {
+				controller._view.hide();
+			}
+		}
 	}
 	
 	presentController(){
 		var controller;
 		
 		const hash = window.location.hash;
+		const hashData = this.parseHash(hash);
+		
 		
 		//	check for adding new event
 		if (hash.match(/\?ae/g)){
@@ -108,7 +130,7 @@ class App {
 				model._year = year;
 				model._month = month;
 				const view = new MonthsView();
-				controller = new MonthsController("months", view, model);
+				controller = new MonthsController(this._element, this._monthsControllerName, view, model);
 			}
 		
 		} else {
@@ -121,9 +143,24 @@ class App {
 			model._month = month;
 			model._day = day;
 			const view = new WeekView();
-			controller = new WeekController("week", view, model);
+			controller = new WeekController(this._element, this._weekControllerName , view, model);
 		}
 		
 		if (controller) { this.push(controller); }
+	}
+	
+	parseHash(hash){
+		var obj = {
+			empty_stack: true,
+			year: null,
+			month: null,
+			day: null,
+			add_event: false,
+			event_open: false
+		}
+		
+		if (!hash) { return obj; }
+		
+		return obj;
 	}
 }

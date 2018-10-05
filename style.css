@@ -1,6 +1,8 @@
 @media only screen {
 	body {
 		overflow: hidden;
+		padding: 0;
+		margin: 0;
 	}
 	.hover {
 		cursor: pointer;
@@ -18,20 +20,50 @@
 		right: 10px;
 		left: auto;
 	}
-	#calendar {
-		height: calc(90vh - 0px);
+	header, footer {
+		height: 50px;
+	}
+	footer {
 		position: absolute;
-		overflow-y: scroll;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+	}
+	#calendar-wrapper {
+		padding: 0;
+		max-width: 1200px;
+		margin: 0px auto;
+		position:relative;
+		height: 100%;
+		width: 100%;
+	}
+	#calendar {
+		height: calc(100vh - 100px);
+		position: absolute;
+		overflow: hidden;
 		top: 50px;
-		left: 10px;
-		right: 10px;
+		left: 0px;
+		width: 100%;
+	}
+	#calendar > .view-wrapper {
+		position: absolute;
+	    height: 100%;
+	    width: 100%;
+	    overflow: hidden;
+	} 
+	#calendar > .view-wrapper > .view-content-wrapper {
+		padding: 0px 10px;
+		height: 100%;
+		overflow-y: scroll;
+/* 		max-width: 1200px; */
+		margin: 0px auto;
 	}
 	.year > .months-wrapper .month {
-		width: 15%;
-		margin: 0px 10px;
-		display:inline-block;
-		text-decoration:none;
-		color:black;
+		width: 12.667%;
+	    margin: 0px 2%;
+	    display: inline-block;
+	    text-decoration: none;
+	    color: black;
 	}
 	.year > .months-wrapper .days span {
 		display:inline-block;
@@ -56,12 +88,13 @@
 		text-align: center;
 	}
 	#months-expanded-container {
-		overflow: scroll;
+		overflow-x: hidden;
+		overflow-y: scroll;
 		margin: 0px;
 		height: calc(100% - 30px);
 	}
 	.month-expanded {
-		
+		overflow-y:auto;
 	}
 	.month-expanded > .days > a {
 		width: 14%;

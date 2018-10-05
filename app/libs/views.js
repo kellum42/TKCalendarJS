@@ -1,17 +1,17 @@
 class View {
+	hide(){
+		this._element.style.opacity = 0;
+	}
 	
-	html(model) {
-		return "";	
+	show(){
+		this._element.style.opacity = 1;
 	}
 }
 
 class YearsView extends View {
-	constructor(years){
-		super();	
-	}
 	
-	html(model){
-		var html = "";
+	refreshHTML(model){
+		var html = "<div class='view-content-wrapper'>";
 		for (var i=0;i<model._years.length;i++) {
 			const year = model._years[i];
 			
@@ -38,19 +38,18 @@ class YearsView extends View {
 			}
 			html += "</div></div>";
 		}
-		return html;
+		html += "</div>";
+		this._element.innerHTML = html;
 	}
 }
 
 class MonthsView extends View {
-	constructor(){
-		super();
-	}
-	
-	html(model){
+
+	refreshHTML(model){
 		//	scroll to selected month functionality
 		const year = model._year;
-		var html = "<div class='weekday-list'><div style='color:grey'>S<span>unday</span></div><div>M<span>onday</span></div><div>T<span>uesday</span></div><div>W<span>ednesday</span></div><div>T<span>hursday</span></div><div>F<span>riday</span></div><div style='color:grey'>S<span>aturday</span></div></div><div id='months-expanded-container'>";
+		var html = "<div style='overflow-y:hidden' class='view-content-wrapper'>";
+		html += "<div class='weekday-list'><div style='color:grey'>S<span>unday</span></div><div>M<span>onday</span></div><div>T<span>uesday</span></div><div>W<span>ednesday</span></div><div>T<span>hursday</span></div><div>F<span>riday</span></div><div style='color:grey'>S<span>aturday</span></div></div><div id='months-expanded-container'>";
 		
 		for (var j=0;j<12;j++) {
 			const month = j;
@@ -75,35 +74,35 @@ class MonthsView extends View {
 			html += "<section style='clear:both'></section></div></div>";
 		}
 		html += "</div>";
-		return html;
+		html += "</div>";
+		this._element.innerHTML = html;
+		
+		//	set month offset
+		const month = document.querySelectorAll(".month-expanded")[model._month];
+		const offsetY = month.offsetTop - 30 // month y pos - (month heading height + any extra padding)
+		this._element.querySelector("#months-expanded-container").scrollTop = offsetY || 0;
 	}
 }
 
 class WeekView extends View {
-	constructor(){
-		super();
-	}
-	
-	html(model) {
+	refreshHTML(model) {
 		var html = "";
 		html = "<div class='swiper-container'>Swiper</div>";
-		return html;
+		this._element.innerHTML = html;
 	}
 }
 
 class AddEventView extends View {
-	constructor(){
-		super();
-	}
 	
-	html(model) {
-		var html = "";
+	refreshHTML(model) {
+		var html = "<div class='view-content-wrapper'>";
 		const desktopMode = model.viewWidth() > 1000;
 		if (desktopMode) {
 			
 		} else {
 			html += "<h1>mobile mode</h1>";
 		}
-		return html;
+		html += "</div>";
+		this._element.innerHTML = html;
 	}
 }
