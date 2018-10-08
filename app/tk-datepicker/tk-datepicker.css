@@ -110,9 +110,30 @@
 	font-size: 28px;
 	padding: 0px;
 	margin: 0px;
+	position: relative;
 }
 .tk-datepicker-time .time-preview > p {
 	margin: 15px 0px;
+}
+.tk-datepicker-time .time-preview > span {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 12px;
+	color: grey;
+	left: 15px;
+	padding: 2px 10px;
+}
+.tk-datepicker-time .time-preview > span:hover {
+	cursor:pointer;
+}
+.tk-datepicker-time .time-preview > span:nth-of-type(2) {
+	left: auto;
+	right: 15px;
+}
+.tk-datepicker-time .time-preview > span.selected {
+	background:#3A76DA;
+	color: white;
 }
 .tk-datepicker-time > div {
 	padding: 0px;

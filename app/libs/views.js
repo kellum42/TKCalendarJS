@@ -110,14 +110,20 @@ class WeekView extends View {
 }
 
 class AddEventView extends View {
-	
-	refreshHTML(model) {
-		var html = "<div class='view-content-wrapper'><h1>add event</h1><div><div><p>Name</p><input type='text' id='add-event-name' /></div><div><p>Date</p><input type='text' id='add-event-date' /></div><div><p>Description</p><textarea id='add-event-description'></textarea></div></div><div><button type='button'>Add Event</button</div></div>";
-		this._element.innerHTML = html;
 		
-		const button = this._element.querySelector("button");
+	refreshHTML(model) {
+		const self = this;
+		var html = "<div class='view-content-wrapper'><h1>add event</h1><div><div><p>Name</p><input type='text' id='event-name' /></div><div><p>Start Date</p><input type='text' id='event-start' /></div><div><p>End Date</p><input type='text' id='event-end' /></div><div><p>Description</p><textarea id='add-event-description'></textarea></div></div><div><button type='button'>Add Event</button</div></div>";
+		self._element.innerHTML = html;
+		
+		self._eventName = self._element.querySelector("#event-name");
+		self._eventStart = self._element.querySelector("#event-start");
+		self._eventEnd = self._element.querySelector("#event-end");
+		self._eventDescription = self._element.querySelector("add-event-description");
+		
+		const button = self._element.querySelector("button");
 		button.onclick = function(){
-			
+			return self._onAddEventClicked();
 		}
 	}
 }

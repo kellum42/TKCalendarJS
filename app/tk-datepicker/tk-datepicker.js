@@ -17,6 +17,7 @@
 			self._date = obj.startingDate || new Date();
 			self._hour = 12;
 			self._mins = 0;
+			self._ap = "am"; // am or pm
 			self._isOpen;
 			
 			//	everytime datepicker closes, reset these
@@ -35,29 +36,29 @@
 			self._datepickerElement = self.createPicker();
 			self.close();
 			
-			document.body.onclick = (function(){
-				return function(e){
-					var el = e.target.parentNode;
-					console.log(el);
-					while (el && !el.classList.contains("tk-datepicker")){
-						el  = el.parentElement;
-					}
-				}
-			}());
+			self._datepickerElement.querySelector(".done-block").onclick = function(){
+				self.close();
+			}
 		}
 		
 		linkCSS(){
-			const head  = document.getElementsByTagName('head')[0];
-		    const link  = document.createElement('link');
-		    link.rel  = 'stylesheet';
-		    link.type = 'text/css';
-		    link.href = 'app/tk-datepicker/tk-datepicker.css';
-		    head.appendChild(link);
-		    
-		    const fontLink = document.createElement('link');
-		    fontLink.rel = "stylesheet";
-		    fontLink.href = "https://fonts.googleapis.com/css?family=K2D";
-		    head.appendChild(fontLink);
+			const head  = document.querySelector("head");
+			head.innerHTML += "<link rel='stylesheet' type='text/css' href='app/tk-datepicker/tk-datepicker.css' />";
+			head.innerHTML += "<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=K2D' />";
+		}
+		
+		refreshBanner(){
+			const self = this;
+			const d = self._date instanceof Date ? self._date : new Date(); // currently selected date
+			const year = self._setYear = self._setYear || d.getFullYear();
+			const month = self._setMonth = (self._setMonth || self._setMonth === 0) ? self._setMonth: false ||  d.getMonth();
+			const el = self._datepickerElement;
+			const mins = self._mins < 10 ? "0" + self._mins: self._mins;
+			const hour = self._hour;
+			const ap = self._ap.toUpperCase();
+			
+			el.querySelector(".tk-datepicker-banner > p:nth-of-type(1)").innerHTML = this.fullMonthName(d.getMonth()) + " " + this.dayWithPrefix(d.getDate()) + ", " + d.getFullYear();
+			el.querySelector(".tk-datepicker-banner > p:nth-of-type(2)").innerHTML = hour + ":" + mins + " " + ap;
 		}
 		
 		refreshDatePicker() {
@@ -67,13 +68,12 @@
 			
 			const year = self._setYear = self._setYear || d.getFullYear();
 			const month = self._setMonth = (self._setMonth || self._setMonth === 0) ? self._setMonth: false ||  d.getMonth();
-			
-			//	configure banner and calendar header
-			el.querySelector(".tk-datepicker-banner > p").innerHTML = this.fullMonthName(d.getMonth()) + " " + this.dayWithPrefix(d.getDate()) + ", " + d.getFullYear();
-			el.querySelector(".tk-datepicker-month > h4").innerHTML = this.fullMonthName(month) + " " + year;
-				
+					
 			const numDays = new Date(year, month + 1, 0).getDate();
 			const offset = new Date(year, month, 1).getDay();
+			
+			//	refresh calendar month
+			el.querySelector(".tk-datepicker-month > h4").innerHTML = this.fullMonthName(month) + " " + year;
 			
 			if (numDays && (offset || offset === 0)) {
 				const daysDiv = el.querySelector(".tk-datepicker-days");
@@ -91,12 +91,14 @@
 					span.innerHTML = l;
 					span.onclick = (function(a,b,c){
 						return function(){
-							if (!a && typeof c === "function") {
+							if (!a) {
 								self._date = b;
+								self.refreshBanner();
 								self.refreshDatePicker();
-								self._onNewDateTappedCallback(b);
-								self._inputElement.value = b.getMonth() + "/" + b.getDate() + "/" + b.getFullYear();
-// 								self.close();
+								self.refreshInputValue();
+								if (typeof c === "function"){
+									self._onNewDateTappedCallback(b);
+								}
 							}	
 						}
 					}(active, cd, self._onNewDateTappedCallback));
@@ -125,15 +127,25 @@
 						c.refreshDatePicker();
 					}	
 				}(month, self, i));	
-			}	
+			}
 		}
 		
 		refreshTimePicker(){
 			//	configure time picker
 			//	setup time and day click functionality
-			
+			const self = this;
+			const el = self._datepickerElement;
 			const hoursEl = el.querySelector(".tk-datepicker-time > .hours");
 			const minsEl = el.querySelector(".tk-datepicker-time > .minutes");
+			
+			//	configure preview element
+			const m = self._mins < 10 ? "0" + self._mins: self._mins;
+			el.querySelector(".tk-datepicker-time > .time-preview > p > span:nth-of-type(1)").innerHTML = self._hour;
+			el.querySelector(".tk-datepicker-time > .time-preview > p > span:nth-of-type(2)").innerHTML = m;
+			
+			
+			//	reset contents
+			hoursEl.innerHTML = minsEl.innerHTML = "";
 			
 			//	configure hours
 			const currentHour = self._hour || 12;
@@ -142,11 +154,14 @@
 				const span = document.createElement("span");
 				span.className = selected;
 				span.innerHTML = i;
-				span.onclick = (function(){
+				span.onclick = (function(a, b){
 					return function(){
-						
+						b._hour = a;
+						b.refreshTimePicker();
+						b.refreshBanner();
+						b.refreshInputValue();
 					}
-				}());
+				}(i, self));
 				hoursEl.appendChild(span);
 			}
 			
@@ -154,22 +169,56 @@
 			const ht = ["00", "15", "30", "45"];
 			for (var i=0;i<4;i++) {
 				const m = ht[i];
+				const selected = parseInt(m) === self._mins ? "selected" : "";
 				const span = document.createElement("span");
 				span.innerHTML = m;
-				span.onclick = (function(){
+				span.className = selected;
+				span.onclick = (function(a, b){
 					return function(){
-						
+						b._mins = parseInt(a);
+						b.refreshTimePicker();
+						b.refreshBanner();
+						self.refreshInputValue();
 					}
-				}());
+				}(m, self));
 				minsEl.appendChild(span);
+			}
+			
+			//	configure am/pm switch
+			const apButtons = el.querySelectorAll(".tk-datepicker-time > .time-preview > span");
+			apButtons[0].className = self._ap === "am" ? "selected" : "";
+			apButtons[1].className = self._ap === "am" ? "" : "selected";
+			for (var i=0;i<apButtons.length;i++) {
+				const button = apButtons[i];
+				button.onclick = (function(a, b){
+					return function(){
+						b._ap = a === 0 ? "am" : "pm";
+						b.refreshTimePicker();
+						b.refreshBanner();
+						b.refreshInputValue();
+					}
+				}(i, self));
 			}
 		}
 		
+		refreshInputValue(){
+			const month = this._date.getMonth();
+			const day = this._date.getDate();
+			const year = this._date.getFullYear();
+			const hour = this._hour;
+			const mins = this._mins < 10 ? "0" + this._mins: this._mins;	// add leading zero
+			const ap = this._ap;
+			
+			this._inputElement.value = month + "/" + day + "/" + year + " " + hour + ":" + mins + " " + ap;
+		}
+		
 		createPicker(){
+			const self = this;
 			const el = document.createElement("div");
+			
 			el.classList.add("tk-datepicker");
 			document.body.appendChild(el);
-			el.innerHTML = "<div class='tk-datepicker-banner'><p></p><p class='time'>12:00 PM</p></div><div class='tk-datepicker-dt'><p class='selected'>DATE</p><p>TIME</p><section style='clear:both'></section></div><div class='tk-datepicker-month'><h4></h4><div class='tk-date-list'><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><section style='clear:both'></section></div><div class='tk-datepicker-days'></div></div><div class='tk-datepicker-time' style='display:none'><section class='time-preview'><p><span class='preview-hours'>4</span>:<span class='preview-minutes'>00</span></p></section><div class='hours'></div><div class='minutes'></div><section style='clear:both'></section></div><div class='done-block'><p>DONE</p></div>";
+			el.innerHTML = "<div class='tk-datepicker-banner'><p></p><p class='time'>12:00 PM</p></div><div class='tk-datepicker-dt'><p class='selected'>DATE</p><p>TIME</p><section style='clear:both'></section></div><div class='tk-datepicker-month'><h4></h4><div class='tk-date-list'><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><section style='clear:both'></section></div><div class='tk-datepicker-days'></div></div><div class='tk-datepicker-time' style='display:none'><section class='time-preview'><p><span></span>:<span></span></p><span>AM</span><span>PM</span></section><div class='hours'></div><div class='minutes'></div><section style='clear:both'></section></div><div class='done-block'><p>DONE</p></div>";
 			
 			//	create arrows
 			const datepickerMonth = el.querySelector(".tk-datepicker-month");
@@ -183,21 +232,30 @@
 			//	configure date/time switch
 			const divs = el.querySelectorAll(".tk-datepicker-dt > p");
 			for (var i=0;i<divs.length;i++) {
-				divs[i].onclick = (function(a, b, c){
+				divs[i].onclick = (function(a, b, c, d){
 					return function(){
 						a[b].classList.add("selected");
 						a[1-b].classList.remove("selected");
 						c.querySelector(".tk-datepicker-month").style.display = b === 0 ? "block": "none";
 						c.querySelector(".tk-datepicker-time").style.display = b === 0 ? "none": "block";
+/*
+						if (b === 0) {
+							d.refreshDatePicker();
+						} else {
+							d.refreshTimePicker();
+						}
+*/
 					}
-				}(divs, i, el));
+				}(divs, i, el, self));
 			}
 			return el;
 		}
 		
 		open(){
 			this._isOpen = true;
+			this.refreshBanner();
 			this.refreshDatePicker();
+			this.refreshTimePicker();
 			this._datepickerElement.style.top = this._inputElement.getBoundingClientRect().bottom;
 			this._datepickerElement.style.left = this._inputElement.getBoundingClientRect().left;
 			this._datepickerElement.style.display = "block";

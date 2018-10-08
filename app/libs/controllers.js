@@ -111,7 +111,7 @@ class Popup extends Controller {
 		this._view._element.classList.add("modal");
 		
 		//	add overlay
-		const o = document.createElement("div");
+		const o = this._overlay = document.createElement("div");
 		o.id = "overlay";
 		o.onclick = function(){
 			window.location.hash = window.location.hash.replace("?ae", "");
@@ -140,17 +140,64 @@ class Popup extends Controller {
 class AddEventPopup extends Popup {
 	constructor(el, name, view, model) {
 		super(el, name, view, model);
+		
+		const self = this;
+		self._view._onAddEventClicked = function(){
+			self.validate();
+		}
 	}
 	
 	load(){
 		super.load();
+		const self = this;
 		
-		this._datepicker = new TKDatepicker({ 
-			element: "#add-event-date",
-			startingDate: false,
-			onNewDateTapped: function(date){
-// 				console.log(date);
-			}
+		self._startDatepicker = new TKDatepicker({ 
+			element: "#event-start",
+			startingDate: false
 		});
+		
+		self._endDatepicker = new TKDatepicker({
+			element: "#event-end",
+			startingDate: false
+		});
+		
+		//	Closes datepicker on wrapper click (excluding input element)
+		self._view._element.onclick = function(e){
+			if (e.target.id !== self._startDatepicker._inputElement.id) {
+				self._startDatepicker.close();
+			}
+			
+			if (e.target.id !== self._endDatepicker._inputElement.id) {
+				self._endDatepicker.close();
+			}
+		}
+	}
+	
+	dismiss(){
+		this._startDatepicker.close(); // closes datepicker whenever view is dismissed
+		this._endDatepicker.close();
+		super.dismiss();
+	}
+	
+	validate(){
+		const self = this;
+		const validationData = [
+			{ 
+				element: self._view._eventName,
+				required: true,
+				name: "Event Name"
+			},
+			{ 
+				element: self._view._eventStart,
+				required: true,
+				name: "Event Start"
+			},
+			{ 
+				element: self._view._eventEnd,
+				required: true,
+				name: "Event End"
+			}	
+		];
+		return self._model._validator.validate(validationData);
 	}
 }
