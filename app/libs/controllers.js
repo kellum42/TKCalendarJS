@@ -21,8 +21,14 @@ class Controller {
 	}
 	
 	setHeaderFooterItems(){
-		this._leftIcon.innerHTML = "";
-		this._leftIcon.onclick = "";
+		const self = this;
+		self._leftIcon.innerHTML = "";
+		self._leftIcon.onclick = "";
+		
+		self._rightIcon.innerHTML = "Add Event";
+		self._rightIcon.onclick = function(){
+			window.location.hash = window.location.hash + "?ae";
+		}	
 	}
 	
 	dismiss(){
@@ -69,11 +75,6 @@ class WeekController extends Controller {
 		self._leftIcon.onclick = function(){
 			window.location.hash = self._model._year + "/" + self._model._month;
 		}
-		
-		self._rightIcon.innerHTML = "Add Event";
-		self._rightIcon.onclick = function(){
-			window.location.hash = window.location.hash + "?ae";
-		}	
 	}
 	
 	load() {
@@ -103,13 +104,53 @@ class WeekController extends Controller {
 	}
 }
 
-class AddEventController extends Controller {
+class Popup extends Controller {
+	constructor(el, name, view, model) {
+		super(el, name, view, model);
+		const self = this;
+		this._view._element.classList.add("modal");
+		
+		//	add overlay
+		const o = document.createElement("div");
+		o.id = "overlay";
+		o.onclick = function(){
+			window.location.hash = window.location.hash.replace("?ae", "");
+		}
+		document.body.appendChild(o);
+		
+		setTimeout(function(){
+			self._view._element.style.right = "0px";
+		}, 100);
+	}
+	
+	dismiss(){
+		const self = this;
+		const o = document.querySelector("#overlay");
+		const v = self._view._element;
+		
+		v.style.right = "-300px";
+		setTimeout(function(){
+			document.body.removeChild(o);
+			self._element.removeChild(v);
+		
+		}, 300);
+	}
+}
+
+class AddEventPopup extends Popup {
 	constructor(el, name, view, model) {
 		super(el, name, view, model);
 	}
 	
-	load() {
+	load(){
 		super.load();
-		const self = this;		
+		
+		this._datepicker = new TKDatepicker({ 
+			element: "#add-event-date",
+			startingDate: false,
+			onNewDateTapped: function(date){
+// 				console.log(date);
+			}
+		});
 	}
 }

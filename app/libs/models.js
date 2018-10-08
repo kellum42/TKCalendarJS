@@ -1,6 +1,5 @@
 class Model {
 	constructor(){
-		this._years;
 		this._year;
 		this._month;
 		
@@ -19,5 +18,19 @@ class Model {
 	
 	viewWidth(){
 		return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+	}
+	
+	years(){
+		const year = parseInt(this._year || this._currentYear);
+		return [year, year + 1, year + 2];
+	}
+	
+	//	events structure
+	//	id, name, day, month, year, description, time
+}
+
+class Event {
+	constructor(){
+		
 	}
 }

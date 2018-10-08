@@ -12,8 +12,8 @@ class YearsView extends View {
 	
 	refreshHTML(model){
 		var html = "<div class='view-content-wrapper'>";
-		for (var i=0;i<model._years.length;i++) {
-			const year = model._years[i];
+		for (var i=0;i<model.years().length;i++) {
+			const year = model.years()[i];
 			
 			html += "<div class='year'><h3>" + year + "</h3><div class='months-wrapper'>";
 			
@@ -86,8 +86,25 @@ class MonthsView extends View {
 
 class WeekView extends View {
 	refreshHTML(model) {
-		var html = "";
-		html = "<div class='swiper-container'>Swiper</div>";
+		var html = "<div class='view-content-wrapper'><div id='swiper' style='overflow:hidden'><div class='day-wrapper'>";
+		
+		for (var i=0;i<24;i++) {
+			const ref = i === 0 ? "class='reference-cell'" : "";
+			const j = (i >= 12 ) ? i - 12 : i;
+			const ap = (i >= 12) ? " PM" : " AM";
+			var t; 
+			if (j == 0 && i >= 12) {
+				t = "noon";
+			} else if (j ==0 && i < 12) {
+				t = "12";
+			}  else {
+				t = j;
+			}
+			const k = t + (t === "noon" ? "" : ap);
+			html += "<div class='cell'><div><p>" + k + "</p></div><div " + ref + "></div></div>";
+		}
+		
+		html += "</div></div></div>";
 		this._element.innerHTML = html;
 	}
 }
@@ -95,14 +112,12 @@ class WeekView extends View {
 class AddEventView extends View {
 	
 	refreshHTML(model) {
-		var html = "<div class='view-content-wrapper'>";
-		const desktopMode = model.viewWidth() > 1000;
-		if (desktopMode) {
-			
-		} else {
-			html += "<h1>mobile mode</h1>";
-		}
-		html += "</div>";
+		var html = "<div class='view-content-wrapper'><h1>add event</h1><div><div><p>Name</p><input type='text' id='add-event-name' /></div><div><p>Date</p><input type='text' id='add-event-date' /></div><div><p>Description</p><textarea id='add-event-description'></textarea></div></div><div><button type='button'>Add Event</button</div></div>";
 		this._element.innerHTML = html;
+		
+		const button = this._element.querySelector("button");
+		button.onclick = function(){
+			
+		}
 	}
 }

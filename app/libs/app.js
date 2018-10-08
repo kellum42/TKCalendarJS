@@ -7,18 +7,22 @@ class App {
 		this._element = element;
 		this._stack = [];	// the current stack of controllers
 		
+		this.initApp = this.initApp.bind(this);
 		this.presentController = this.presentController.bind(this);
 		window.addEventListener('hashchange', this.presentController);
-	    window.addEventListener('DOMContentLoaded', this.presentController);
+	    window.addEventListener('DOMContentLoaded', this.initApp);
 	    
 	    this._monthsControllerName = "months-controller";
 	    this._yearsControllerName = "years-controller";
 	    this._weekControllerName = "week-controller";
+	    this._addEventControllerName = "add-event-controller";
 	}
 	
 	push(controller){		
 		const currentController = this._stack[this._stack.length - 1];
-		currentController._view.hide(); // so it doesn't show under new controller
+		if (controller._name !== this._addEventControllerName) {
+			currentController._view.hide(); // so it doesn't show under new controller	
+		}
 				
 		this._stack.push(controller);
 		controller.load();	
@@ -35,132 +39,100 @@ class App {
 	    controller._view.show();
 	}
 	
-	staticallyShowController(segments){		
+	initApp(){		
+		const hashData = this.parseHash(window.location.hash);
 		const model = new Model();
+		model._year = hashData.year;
+		model._month = hashData.month;
+		model._day = hashData.day;
 		
-		var controllers = [];
+		const names = ["year", "month", "week"];
 		
-		if (segments.length >= 1 || segments.length >= 0) {
-			const year = parseInt(segments[0]) ||  (new Date).getFullYear(); // defaults to current year
-			const years = [year, year + 1, year + 2];
-			model._years = years;
-			controllers.push(new Controller(this._element, this._yearsControllerName, new YearsView(), model));
-		}
-		
-		if (segments.length >= 2) {
-			const year = segments[0];
-			const month = segments[1];
-			
-			if (year && month) {
-				model._year = year;
-				model._month = month;
-				const view = new MonthsView();
-				controllers.push(new MonthsController(this._element, this._monthsControllerName, view, model));				
+		for (var i=0;i<names.length;i++) {
+			var controller;
+			if (i === 0 ) {
+				controller = new Controller(this._element, this._yearsControllerName, new YearsView(), model);
+			} else if (i === 1) {
+				controller = new MonthsController(this._element, this._monthsControllerName, new MonthsView(), model);
+			} else {
+				controller = new WeekController(this._element, this._weekControllerName , new WeekView(), model);
 			}
-		}
-		
-		if (segments.length > 2) {
-			//	days
-			const year = segments[0];
-			const month = segments[1];
-			const day = segments[2];
-			
-			model._year = year;
-			model._month = month;
-			model._day = day;
-			const view = new WeekView();
-			controllers.push(new WeekController(this._element, this._weekControllerName , view, model));
-		}
-		
-		for (var i=0;i<controllers.length;i++) {
-			const controller = controllers[i];
 			controller.load();
 			this._stack.push(controller);
-				
-			if (i !== controllers.length - 1) {
+		
+			if (names[i] === hashData.controller) {
+				break; // stop loop here
+			
+			} else {
 				controller._view.hide();
 			}
+		}
+		
+		if (hashData.add_event) {
+			this.push(new AddEventPopup(this._element, this._addEventControllerName, new AddEventView(), model));
+/*
+			const controller = new Popup(this._element, this._addEventControllerName, new AddEventView(), model);
+			controller.load();
+			this._stack.push(controller);
+*/
 		}
 	}
 	
 	presentController(){
-		var controller;
-		
-		const hash = window.location.hash;
-		const hashData = this.parseHash(hash);
-		
-		
-		//	check for adding new event
-		if (hash.match(/\?ae/g)){
-			const view = new AddEventView();
-			const model = new Model();
-			const controller = new AddEventController("add-event", view, model);
-			this.push(controller);
-			return;	
-		}
-		
-		const url = (hash.split("#")) ? hash.split("#")[1] : false;
-		var segments = url ? url.split("/") : false;
-		segments = segments || [];
-		
-		
-		//	if stack length is zero, we know we are just starting out (the app was just loaded)
-		//	don't do any animations? just add controllers to the stack
-		if (this._stack.length == 0) {
-			this.staticallyShowController(segments);
-			return;
-		}
+		const hashData = this.parseHash(window.location.hash);
 		
 		//	if they are equal then we are pushing
 		//	if its less then we are popping
 		//	they should never be equal at this point in the function (unless we are just starting)
-		//	at the end of this function, stack length and segments length should always be equal		
-		if (segments.length < this._stack.length) {
+		//	at the end of this function, stack length and segments length should always be equal	
+		if (hashData.segment_count < this._stack.length) {
 			this.pop();
 			return;
 		}
-
+		
+		var controller;
+		
 		const model = new Model();
-
-		if (segments.length === 2) {
-			const year = segments[0];
-			const month = segments[1];
-			
-			if (year && month) {
-				model._year = year;
-				model._month = month;
-				const view = new MonthsView();
-				controller = new MonthsController(this._element, this._monthsControllerName, view, model);
-			}
+		model._year = hashData.year;
+		model._month = hashData.month;
+		model._day = hashData.day;
+		
+		if (hashData.add_event){
+			controller = new AddEventPopup(this._element, this._addEventControllerName, new AddEventView(), model);
+		
+		} else if (hashData.controller === "week"){
+			controller = new WeekController(this._element, this._weekControllerName , new WeekView(), model);
 		
 		} else {
-			//	days controller
-			const year = segments[0];
-			const month = segments[1];
-			const day = segments[2];
-			
-			model._year = year;
-			model._month = month;
-			model._day = day;
-			const view = new WeekView();
-			controller = new WeekController(this._element, this._weekControllerName , view, model);
+			controller = new MonthsController(this._element, this._monthsControllerName, new MonthsView(), model);
 		}
-		
-		if (controller) { this.push(controller); }
+		this.push(controller);
 	}
 	
 	parseHash(hash){
 		var obj = {
-			empty_stack: true,
 			year: null,
 			month: null,
 			day: null,
 			add_event: false,
-			event_open: false
+			event_open: false,
+			segment_count: 0,
+			controller: "year"
+		};
+		
+		if (hash.match(/\?ae/g)) {
+			obj.add_event = true;
+			hash = hash.split("?")[0];
 		}
 		
-		if (!hash) { return obj; }
-		
+		hash = hash || "";
+		hash = hash.split("#")[1] || "";  
+		var segments = hash.split("/") || [];
+		obj.segment_count = segments.length;
+		obj.year = segments[0] || (new Date).getFullYear();
+		obj.month = segments[1] || null;
+		obj.day = segments[2] || null;
+		obj.controller = (obj.day ? "week": null) || (obj.month ? "month" : null) || "year";
 		return obj;
 	}
 }

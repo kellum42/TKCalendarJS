@@ -1,0 +1,166 @@
+.tk-datepicker {
+	width: 275px;
+	font-family: 'K2D', sans-serif;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	box-sizing: border-box;
+	z-index: 999;
+	position:absolute;
+	background: white;
+}
+.tk-datepicker-banner {
+    background: #3A76DA;
+    padding: 0 10px;
+    overflow: auto;
+    color: white;
+    position: relative;
+}
+.tk-datepicker-banner > p {
+	font-size: 16px;
+	margin: 10px 0px;
+}
+.tk-datepicker-banner > p.time {
+	position: absolute;
+    right: 10px;
+    color: white;
+    top: 0;
+}
+.tk-datepicker-dt {
+	box-sizing: border-box;
+	background: #cccccc;
+}
+.tk-datepicker-dt > p {
+	width: 50%;
+	margin: 0px;
+	display:inline-block;
+	padding: 8px 0px;
+	float:left;
+	text-align:center;
+	font-size: 14px;
+}
+.tk-datepicker-dt > p:hover {
+	cursor: pointer;
+}
+.tk-datepicker-dt > p.selected {
+	background: white;
+	font-weight:bold;
+}
+.tk-datepicker-month {
+	overflow: auto;
+	position:relative;
+}
+.tk-datepicker-month > h4 {
+	text-align: center;
+	font-size: 18px;
+	margin: 15px 0px;
+}
+.tk-date-list {
+	margin: 0px 0px 15px 0px;
+}
+.tk-date-list > span {
+	display:inline-block;
+	width: 14.286%;
+	float:left;
+	text-align: center;
+	color: grey;
+	font-size: 14px;
+	margin: 0px;
+}
+.tk-datepicker-days > span {
+	display:inline-block;
+	width: 14.286%;
+	text-align: center;
+	font-size: 16px;
+	padding: 10px 0px;
+	margin: 0px 0px;
+	color: black;
+}
+.tk-datepicker-days > span:not(.disabled):hover {
+	cursor:pointer;
+}
+.tk-datepicker-days > span:not(.selected):not(.disabled):hover {
+	background: #f2f2f2;
+}
+.tk-datepicker-days > span.disabled {
+	color: #cccccc;
+}
+.tk-datepicker-days > span.selected {
+	background: #3A76DA;
+	color: white;
+}
+.tk-arrow {
+	position:absolute;
+	top: 18px;
+	left: 10px;
+}
+.tk-datepicker-right-arrow.tk-arrow {
+	left: auto;
+	right: 10px;
+}
+.tk-arrow > img {
+	height: auto;
+	width: 8px;
+}
+.tk-datepicker-time {
+	z-index: 99;
+	position: relative;
+}
+.tk-datepicker-time .time-preview {
+	overflow: auto;
+	text-align: center;
+	font-size: 28px;
+	padding: 0px;
+	margin: 0px;
+}
+.tk-datepicker-time .time-preview > p {
+	margin: 15px 0px;
+}
+.tk-datepicker-time > div {
+	padding: 0px;
+	float:left;
+	margin: 0px;
+	box-sizing: border-box;
+}
+.tk-datepicker-time > .hours {
+	width: 75%;
+	border-right: 2px solid #cccccc;
+}
+.tk-datepicker-time > .minutes {
+	width: 25%;
+}
+.tk-datepicker-time > div > span {
+	float:left;
+	padding: 10px 0px;
+	text-align: center;
+	border-bottom: 1px solid #f2f2f2;
+	border-right: 1px solid #f2f2f2;
+	box-sizing: border-box;
+	display: inline-block;
+}
+.tk-datepicker-time > div > span:hover {
+	cursor:pointer;
+}
+.tk-datepicker-time > div > span:not(.selected):hover {
+	background: #f2f2f2;
+}
+.tk-datepicker-time > .hours > span {
+	width: 33.333%;
+}
+.tk-datepicker-time > .minutes > span {
+	width: 100%;
+}
+.tk-datepicker-time > div > span.selected {
+	background: #3A76DA;
+	color: white;
+}
+.tk-datepicker > .done-block {
+	padding: 10px 0px;
+	background: #3A76DA;
+}
+.tk-datepicker > .done-block > p {
+	margin: 0px;
+	text-align: center;
+	color: white;
+}
+.tk-datepicker > .done-block:hover {
+	cursor: pointer;
+}

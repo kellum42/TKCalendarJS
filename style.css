@@ -51,6 +51,16 @@
 	    width: 100%;
 	    overflow: hidden;
 	} 
+	#calendar > .view-wrapper.modal {
+		width: 300px;
+	    background: #fff;
+	    right: -300px;
+	    position: fixed;
+	    top: 0;
+	    z-index: 5;
+	    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	    transition: right 0.3s ease;
+	}
 	#calendar > .view-wrapper > .view-content-wrapper {
 		padding: 0px 10px;
 		height: 100%;
@@ -137,5 +147,57 @@
 	.month-expanded > .days > a > .events > .event.purple {
 		background: purple;
 		color: white;
+	}
+	.day-wrapper {
+		position: relative;
+		margin-top: 30px;
+	}
+	.day-wrapper > .cell {
+		position:relative;
+		height: 75px;
+	}
+	.day-wrapper > .cell > div:nth-of-type(1) {
+		position: absolute;
+		height: 100%;
+		width: 45px;
+	}
+	.day-wrapper > .cell > div:nth-of-type(1) > p {
+		color: grey;
+		font-size: 14px;
+		margin: -10px 0px 0px 0px;
+	}
+	.day-wrapper > .cell > div:nth-of-type(2) {
+		height: 100%;
+		border-top: 1px grey solid;
+		margin-left: 55px;
+		position: relative;
+	}
+	.day-wrapper > .cell > div:nth-of-type(2) > .event {
+		position: absolute;
+	    background: green;
+	    width: 25%;
+	    padding: 0px;
+	    box-sizing: border-box;
+	    height: 200%;
+	    font-size: 14px;
+	    z-index: 2;
+	}
+	.day-wrapper > .cell > div:nth-of-type(2) > .event > p {
+		color: white;
+		margin: 0;
+		position:absolute;
+		top:50%;
+		transform: translateY(-50%);
+		width: 100%;
+		text-align: left;
+		padding: 5px;
+	}
+	#overlay {
+		position: fixed;
+	    background: rgba(0,0,0,0.3);
+	    height: 100%;
+	    width: 100%;
+	    top: 0;
+	    left: 0;
 	}
 }
