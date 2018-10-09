@@ -34,10 +34,57 @@ class Model {
 
 class EventManager {
 	
-	makeEvent(obj){
-		if (!obj.name || !obj.startDate || !obj.endDate) {
+	constructor(){
+		this._identifier = "events";
+		this._storage = window.localStorage;
+	}
+	
+	saveEvent(obj){
+		if (!obj.name || !obj.start_date || !obj.end_date) {
 			//	throw error
+			return false;
 		}
+		const event = {
+			id: this.guid(),
+			name: obj.name,
+			start: obj.start_date,
+			end: obj.end_date,
+			description: obj.description || ""
+		}
+		
+		var events = this.getEvents() || [];
+		events.push(event);
+		this._storage.setItem(this._identifier, JSON.stringify(events));
+		
+		console.log("successful");
+	}
+	
+	getEvents(){
+		return JSON.parse(this._storage.getItem(this._identifier)) || [];
+	}
+	
+	eventsForDay(year, month, day) {
+		var events = [];
+		var allEvents = this.getEvents();
+		for (var i=0;i<allEvents.length;i++) {
+			const e = allEvents[i];
+			const d = new Date(e.start);
+			console.log(e);
+			console.log("month: " + d.getMonth() + ", day: " + d.getDate() + ", hour: " + d.getHours() + ", min: " + d.getMinutes() + ", secs: " + d.getSeconds());
+/*
+			if (d.getFullYear() === year && d.getMonth() === month && d.getDate() === day){
+				events.push(e);
+			} 
+*/
+		}
+		return events;
+	}
+	
+	guid() {
+		function s4() { 
+			return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+	  	}
+	  	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 	}
 }
 

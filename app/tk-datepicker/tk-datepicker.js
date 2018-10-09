@@ -83,7 +83,7 @@
 					const day = (k + 1) - offset;
 					const l = (day > 0 && day <= numDays) ? day : "";
 					const cd = new Date(year, month, day);
-					var active = cd.getTime() < new Date().getTime() ? " disabled" : "";
+					var active = cd.getTime() < self.todayZeroed().getTime() ? " disabled" : "";
 					active = l ? active : " disabled";
 					const selected = year === d.getFullYear() && month === d.getMonth() && l === d.getDate() ? " selected" : "";
 					const span = document.createElement("span");
@@ -154,14 +154,18 @@
 				const span = document.createElement("span");
 				span.className = selected;
 				span.innerHTML = i;
-				span.onclick = (function(a, b){
+				span.onclick = (function(a, b, c){
 					return function(){
+						const ap = c.querySelectorAll(".tk-datepicker-time > .time-preview > span.selected");
+						const pm = ap ? ap.innerText !== "AM" && a !== 12 : true;
+						const h = pm ? a + 12 : a;
 						b._hour = a;
+						b._date.setHours(h);
 						b.refreshTimePicker();
 						b.refreshBanner();
 						b.refreshInputValue();
 					}
-				}(i, self));
+				}(i, self, el));
 				hoursEl.appendChild(span);
 			}
 			
@@ -176,6 +180,7 @@
 				span.onclick = (function(a, b){
 					return function(){
 						b._mins = parseInt(a);
+						b._date.setMinutes(parseInt(a));
 						b.refreshTimePicker();
 						b.refreshBanner();
 						self.refreshInputValue();
@@ -238,13 +243,6 @@
 						a[1-b].classList.remove("selected");
 						c.querySelector(".tk-datepicker-month").style.display = b === 0 ? "block": "none";
 						c.querySelector(".tk-datepicker-time").style.display = b === 0 ? "none": "block";
-/*
-						if (b === 0) {
-							d.refreshDatePicker();
-						} else {
-							d.refreshTimePicker();
-						}
-*/
 					}
 				}(divs, i, el, self));
 			}
@@ -276,5 +274,13 @@
 		dayWithPrefix(day){
 			const days = ["", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th", "11th", "12th", "13th", "14th", "15th", "16th", "17th", "18th", "19th", "20th", "21st", "22nd", "23rd", "24th", "25th", "26th", "27th", "28th", "29th", "30th", "31st"];
 			return days[day] || "";
+		}
+		
+		todayZeroed(){
+			const t = new Date();
+			const y = t.getFullYear();
+			const m = t.getMonth();
+			const d = t.getDate();
+			return new Date(y, m, d, 0, 0);
 		}
 	}	

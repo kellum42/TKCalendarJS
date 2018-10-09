@@ -70,11 +70,6 @@ class App {
 		
 		if (hashData.add_event) {
 			this.push(new AddEventPopup(this._element, this._addEventControllerName, new AddEventView(), model));
-/*
-			const controller = new Popup(this._element, this._addEventControllerName, new AddEventView(), model);
-			controller.load();
-			this._stack.push(controller);
-*/
 		}
 	}
 	

@@ -46,7 +46,7 @@ class YearsView extends View {
 class MonthsView extends View {
 
 	refreshHTML(model){
-		//	scroll to selected month functionality
+		
 		const year = model._year;
 		var html = "<div style='overflow-y:hidden' class='view-content-wrapper'>";
 		html += "<div class='weekday-list'><div style='color:grey'>S<span>unday</span></div><div>M<span>onday</span></div><div>T<span>uesday</span></div><div>W<span>ednesday</span></div><div>T<span>hursday</span></div><div>F<span>riday</span></div><div style='color:grey'>S<span>aturday</span></div></div><div id='months-expanded-container'>";
@@ -77,7 +77,7 @@ class MonthsView extends View {
 		html += "</div>";
 		this._element.innerHTML = html;
 		
-		//	set month offset
+		//	scroll to selected month functionality
 		const month = document.querySelectorAll(".month-expanded")[model._month];
 		const offsetY = month.offsetTop - 30 // month y pos - (month heading height + any extra padding)
 		this._element.querySelector("#months-expanded-container").scrollTop = offsetY || 0;
@@ -119,7 +119,7 @@ class AddEventView extends View {
 		self._eventName = self._element.querySelector("#event-name");
 		self._eventStart = self._element.querySelector("#event-start");
 		self._eventEnd = self._element.querySelector("#event-end");
-		self._eventDescription = self._element.querySelector("add-event-description");
+		self._eventDescription = self._element.querySelector("#add-event-description");
 		
 		const button = self._element.querySelector("button");
 		button.onclick = function(){

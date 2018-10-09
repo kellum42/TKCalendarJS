@@ -11,13 +11,16 @@ class Controller {
 		v.classList.add(name);
 		this._view._element = v;
 		this._element.appendChild(v);	
+		
+		this._leftIcon = document.querySelector('#left-icon');
+		this._rightIcon = document.querySelector('#right-icon');	
 	}
 	
 	load(){
-		this._view.refreshHTML(this._model);		
-		this._leftIcon = document.querySelector('#left-icon');
-		this._rightIcon = document.querySelector('#right-icon');	
+		this._view.refreshHTML(this._model);			
 		this.setHeaderFooterItems();
+		
+		console.log(this._model._eventManager.eventsForDay(2018, 9, 8));
 	}
 	
 	setHeaderFooterItems(){
@@ -142,8 +145,28 @@ class AddEventPopup extends Popup {
 		super(el, name, view, model);
 		
 		const self = this;
+		
 		self._view._onAddEventClicked = function(){
-			self.validate();
+			const validation = self.validate();
+			if (validation.status === "ok") {
+				
+				console.log(self._startDatepicker._date);
+				return;
+				
+				//	create event
+				const event = {
+					name: self._view._eventName.value,
+					start_date: self._startDatepicker._date,
+					end_date: self._endDatepicker._date,
+					description: self._view._eventDescription.value || ""
+				}
+				self._model._eventManager.saveEvent(event);
+				self.dismiss();
+				
+			} else {
+				//	TODO: do some type of error message here
+				console.log(validation.message);
+			}
 		}
 	}
 	
