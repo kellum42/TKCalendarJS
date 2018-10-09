@@ -20,9 +20,9 @@
 			self._ap = "am"; // am or pm
 			self._isOpen;
 			
-			//	everytime datepicker closes, reset these
-			self._setYear;
-			self._setMonth;
+			//	everytime datepicker closes, these are reset to the current date
+			self._showingYear; // the year shown on the calendar of the datepicker
+			self._showingMonth;	// the month shown on the calendar of the datepicker
 			
 			//	open datepicker
 			self._inputElement.onfocus = function(){
@@ -50,8 +50,8 @@
 		refreshBanner(){
 			const self = this;
 			const d = self._date instanceof Date ? self._date : new Date(); // currently selected date
-			const year = self._setYear = self._setYear || d.getFullYear();
-			const month = self._setMonth = (self._setMonth || self._setMonth === 0) ? self._setMonth: false ||  d.getMonth();
+			const year = self._showingYear = self._showingYear || d.getFullYear();
+			const month = self._showingMonth = (self._showingMonth || self._showingMonth === 0) ? self._showingMonth: false ||  d.getMonth();
 			const el = self._datepickerElement;
 			const mins = self._mins < 10 ? "0" + self._mins: self._mins;
 			const hour = self._hour;
@@ -66,8 +66,8 @@
 			const el = self._datepickerElement;
 			const d = self._date instanceof Date ? self._date : new Date(); // currently selected date
 			
-			const year = self._setYear = self._setYear || d.getFullYear();
-			const month = self._setMonth = (self._setMonth || self._setMonth === 0) ? self._setMonth: false ||  d.getMonth();
+			const year = self._showingYear = self._showingYear || d.getFullYear();	// set showing year if not set
+			const month = self._showingMonth = (self._showingMonth || self._showingMonth === 0) ? self._showingMonth: false ||  d.getMonth(); // set showing month if not set
 					
 			const numDays = new Date(year, month + 1, 0).getDate();
 			const offset = new Date(year, month, 1).getDay();
@@ -114,14 +114,14 @@
 					return function(){
 						const increment = d === 0 ? -1 : 1;
 						const newMonth = parseInt(b) + increment;
-						c._setMonth = newMonth;
+						c._showingMonth = newMonth;
 						if (newMonth > 11) {
-							c._setYear = parseInt(c._setYear) + 1; // if new month brings a new year
-							c._setMonth = 0;
+							c._showingYear = parseInt(c._showingYear) + 1; // if new month brings a new year
+							c._showingMonth = 0;
 							
 						} else if (newMonth < 0) {
-							c._setYear = parseInt(c._setYear) - 1; // if new month goes back a year
-							c._setMonth = 11;
+							c._showingYear = parseInt(c._showingYear) - 1; // if new month goes back a year
+							c._showingMonth = 11;
 						} 
 						
 						c.refreshDatePicker();
@@ -139,7 +139,7 @@
 			const minsEl = el.querySelector(".tk-datepicker-time > .minutes");
 			
 			//	configure preview element
-			const m = self._mins < 10 ? "0" + self._mins: self._mins;
+			const m = self._mins < 10 ? "0" + self._mins: self._mins;	// add leading zero to minutes
 			el.querySelector(".tk-datepicker-time > .time-preview > p > span:nth-of-type(1)").innerHTML = self._hour;
 			el.querySelector(".tk-datepicker-time > .time-preview > p > span:nth-of-type(2)").innerHTML = m;
 			
@@ -156,11 +156,11 @@
 				span.innerHTML = i;
 				span.onclick = (function(a, b, c){
 					return function(){
-						const ap = c.querySelectorAll(".tk-datepicker-time > .time-preview > span.selected");
-						const pm = ap ? ap.innerText !== "AM" && a !== 12 : true;
-						const h = pm ? a + 12 : a;
+// 						const ap = c.querySelectorAll(".tk-datepicker-time > .time-preview > span.selected");
+// 						const isPM = ap ? ap.innerText !== "AM" && a !== 12 : true;
+// 						const h = b._ap === "am" ? a : a + 12;
 						b._hour = a;
-						b._date.setHours(h);
+// 						b._date.setHours(a);
 						b.refreshTimePicker();
 						b.refreshBanner();
 						b.refreshInputValue();
@@ -180,7 +180,7 @@
 				span.onclick = (function(a, b){
 					return function(){
 						b._mins = parseInt(a);
-						b._date.setMinutes(parseInt(a));
+// 						b._date.setMinutes(parseInt(a));
 						b.refreshTimePicker();
 						b.refreshBanner();
 						self.refreshInputValue();
@@ -262,8 +262,20 @@
 		close(){
 			this._isOpen = false;
 			this._datepickerElement.style.display = "none";
-			this._setYear = null;
-			this._setMonth = null;
+			this._showingYear = null;
+			this._showingMonth = null;
+		}
+		
+		extractDate(){
+			const self = this;
+			const y = self._date.getFullYear();
+			const m = self._date.getMonth();
+			const d = self._date.getDate();
+			var h = parseInt(self._hour);
+			h = self._ap === "am" && h === 12 ? 0 : h;
+			h = self._ap === "pm" && h !== 12 ? h + 12 : h; // get hours in military time
+			const mn = self._mins;
+			return new Date(y, m, d, h, mn, 0, 0);
 		}
 		
 		fullMonthName(month){

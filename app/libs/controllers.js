@@ -18,9 +18,7 @@ class Controller {
 	
 	load(){
 		this._view.refreshHTML(this._model);			
-		this.setHeaderFooterItems();
-		
-		console.log(this._model._eventManager.eventsForDay(2018, 9, 8));
+		this.setHeaderFooterItems();		
 	}
 	
 	setHeaderFooterItems(){
@@ -150,14 +148,18 @@ class AddEventPopup extends Popup {
 			const validation = self.validate();
 			if (validation.status === "ok") {
 				
-				console.log(self._startDatepicker._date);
-				return;
+				if (self._endDatepicker.extractDate() < self._startDatepicker.extractDate()) { 
+					//	TODO: do some type of error message here
+					//	error - end date is before start date
+					console.log("end date is before start date");
+					return;
+				}
 				
 				//	create event
 				const event = {
 					name: self._view._eventName.value,
-					start_date: self._startDatepicker._date,
-					end_date: self._endDatepicker._date,
+					start_date: self._startDatepicker.extractDate(),
+					end_date: self._endDatepicker.extractDate(),
 					description: self._view._eventDescription.value || ""
 				}
 				self._model._eventManager.saveEvent(event);

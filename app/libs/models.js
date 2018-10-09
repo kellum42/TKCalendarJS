@@ -2,6 +2,7 @@ class Model {
 	constructor(){
 		this._year;
 		this._month;
+		this._day;
 		
 		const today = new Date();
 		this._currentYear = today.getFullYear();
@@ -55,8 +56,6 @@ class EventManager {
 		var events = this.getEvents() || [];
 		events.push(event);
 		this._storage.setItem(this._identifier, JSON.stringify(events));
-		
-		console.log("successful");
 	}
 	
 	getEvents(){
@@ -69,13 +68,10 @@ class EventManager {
 		for (var i=0;i<allEvents.length;i++) {
 			const e = allEvents[i];
 			const d = new Date(e.start);
-			console.log(e);
-			console.log("month: " + d.getMonth() + ", day: " + d.getDate() + ", hour: " + d.getHours() + ", min: " + d.getMinutes() + ", secs: " + d.getSeconds());
-/*
 			if (d.getFullYear() === year && d.getMonth() === month && d.getDate() === day){
+				console.log("got here");
 				events.push(e);
 			} 
-*/
 		}
 		return events;
 	}
@@ -85,6 +81,41 @@ class EventManager {
 			return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	  	}
 	  	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+	}
+}
+
+class Event {
+	constructor(obj){
+		for (var property in obj) {
+		    if (obj.hasOwnProperty(property)) {
+		        this["_" + property] = obj[property];
+		    }
+		}
+	}
+	
+	height(){
+		const s = new Date(this._start);
+		const e = new Date(this._end);
+		const c = 100 /(1000 * 60 * 60);	// convert milliseconds to hours
+		const d = (e.getTime() - s.getTime()) * c;
+		return d + "%";
+	}
+	
+	top(){
+		const s = new Date(this._start);
+		const h = s.getHours();
+		const m = s.getMinutes();
+		const t = 100 * ((h * 60 + m) / 60);
+		return t + "%";
+	}
+	
+	html(){
+		const div = document.createElement("div");
+		div.style.height = this.height();
+		div.style.top = this.top();
+		div.className = "event";
+		div.innerHTML = "<p>" + this._name + "</p>";
+		return div;
 	}
 }
 
