@@ -110,13 +110,12 @@ class WeekView extends View {
 		const refCell = this._element.querySelector(".reference-cell");
 		const events = model._eventManager.eventsForDay(parseInt(model._year), parseInt(model._month), parseInt(model._day));
 		
+		var map = {};
 		for (var i=0;i<events.length;i++) {
-			//	create event
-			//	length of event
-			//	start time of event
 			const event = new Event(events[i]);
-			
-			refCell.appendChild(event.html());
+			const eventElement = event.html();
+			eventElement.onclick = this.onEventClick(event._id);
+			refCell.appendChild(eventElement);
 			
 		}
 	}

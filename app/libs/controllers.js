@@ -68,6 +68,11 @@ class MonthsController extends Controller {
 class WeekController extends Controller {
 	constructor(el, name, view, model) {
 		super(el, name, view, model);
+		
+		this._view.onEventClick = function(id) {
+			//	on event click
+			console.log(id);
+		} 
 	}
 	
 	setHeaderFooterItems(){
@@ -115,7 +120,7 @@ class Popup extends Controller {
 		const o = this._overlay = document.createElement("div");
 		o.id = "overlay";
 		o.onclick = function(){
-			window.location.hash = window.location.hash.replace("?ae", "");
+			window.location.hash = window.location.hash.replace("?ae", "");	// dismisses the controller
 		}
 		document.body.appendChild(o);
 		
@@ -131,7 +136,7 @@ class Popup extends Controller {
 		
 		v.style.right = "-300px";
 		setTimeout(function(){
-			document.body.removeChild(o);
+			document.body.removeChild(o);			
 			self._element.removeChild(v);
 		
 		}, 300);
@@ -163,7 +168,10 @@ class AddEventPopup extends Popup {
 					description: self._view._eventDescription.value || ""
 				}
 				self._model._eventManager.saveEvent(event);
-				self.dismiss();
+				window.location.hash = window.location.hash.replace("?ae", ""); // dismiss the controller
+				
+				//	reload controller that is on top
+				//	keep the scroll offset so it doesn't look any different
 				
 			} else {
 				//	TODO: do some type of error message here
@@ -202,6 +210,7 @@ class AddEventPopup extends Popup {
 		this._startDatepicker.close(); // closes datepicker whenever view is dismissed
 		this._endDatepicker.close();
 		super.dismiss();
+// 		window.location.hash = window.location.hash.replace("?ae", "");
 	}
 	
 	validate(){

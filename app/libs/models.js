@@ -109,12 +109,34 @@ class Event {
 		return t + "%";
 	}
 	
+	startTime(){
+		const s = new Date(this._start);
+		const h = s.getHours();
+		const ap = h >= 12 ? "pm" : "am";
+		var hrs = h > 12 ? h - 12 : h;
+		hrs = hrs === 0 ? 12 : hrs;
+		const min = s.getMinutes();
+		const m = min < 10 ? "0" + min: min;	// add leading zero to minutes if needed
+		return hrs + ":" + m + " " + ap;
+	}
+	
+	endTime(){
+		const e = new Date(this._end);
+		const h = e.getHours();
+		const min = e.getMinutes();
+		const ap = h >= 12 ? "pm" : "am";
+		var hrs = h > 12 ? h - 12 : h;
+		hrs = hrs === 0 ? 12 : hrs;
+		const m = min < 10 ? "0" + min: min;	// add leading zero to minutes if needed
+		return hrs + ":" + m + " " + ap;
+	}
+	
 	html(){
 		const div = document.createElement("div");
 		div.style.height = this.height();
 		div.style.top = this.top();
 		div.className = "event";
-		div.innerHTML = "<p>" + this._name + "</p>";
+		div.innerHTML = "<p><strong>" + this._name + "</strong></p><p>" + this.startTime() + " - " + this.endTime() + "</p>";
 		return div;
 	}
 }

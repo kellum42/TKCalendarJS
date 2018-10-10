@@ -174,6 +174,7 @@
 	}
 	.day-wrapper > .cell > div:nth-of-type(2) > .event {
 		position: absolute;
+		border-radius: 5px;
 	    background: green;
 	    width: 25%;
 	    padding: 0px;
@@ -185,12 +186,8 @@
 	.day-wrapper > .cell > div:nth-of-type(2) > .event > p {
 		color: white;
 		margin: 0;
-		position:absolute;
-		top:50%;
-		transform: translateY(-50%);
-		width: 100%;
 		text-align: left;
-		padding: 5px;
+		padding: 2px 5px;
 	}
 	#overlay {
 		position: fixed;
