@@ -139,6 +139,23 @@ class Event {
 		div.innerHTML = "<p><strong>" + this._name + "</strong></p><p>" + this.startTime() + " - " + this.endTime() + "</p>";
 		return div;
 	}
+	
+	span(){
+		const length = parseInt(this.height().slice(0,-1));
+		const increments = parseInt(length / 25); // number of 15 min increments the event has
+		const comps = this.startTime().split(" ");
+		var h = comps[0].split(":")[0];
+		const m = comps[0].split(":")[1];
+		const ap = comps[1];
+		h = ap === "am" ? h : h + 12;
+		var start = (h * 60 + parseInt(m)) / 60;
+		start = start * 4;	// convert to integer -> each 15 mins = 1
+		var arr = [];
+		for (var i=start;i<start + increments;i++){
+			arr.push(i);
+		}
+		return arr;
+	}
 }
 
 class Validator {

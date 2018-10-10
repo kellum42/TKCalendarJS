@@ -210,7 +210,6 @@ class AddEventPopup extends Popup {
 		this._startDatepicker.close(); // closes datepicker whenever view is dismissed
 		this._endDatepicker.close();
 		super.dismiss();
-// 		window.location.hash = window.location.hash.replace("?ae", "");
 	}
 	
 	validate(){

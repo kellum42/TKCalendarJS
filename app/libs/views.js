@@ -110,13 +110,29 @@ class WeekView extends View {
 		const refCell = this._element.querySelector(".reference-cell");
 		const events = model._eventManager.eventsForDay(parseInt(model._year), parseInt(model._month), parseInt(model._day));
 		
-		var map = {};
 		for (var i=0;i<events.length;i++) {
 			const event = new Event(events[i]);
 			const eventElement = event.html();
 			eventElement.onclick = this.onEventClick(event._id);
 			refCell.appendChild(eventElement);
 			
+			var map = {};
+			var max = 0;
+			
+			const increments = event.span();
+			for (var j=0;j<increments.length;j++) {
+				const v = map[increments[j]];
+				const nv = v ? v + 1 : 1;
+				map[increments[j]] = nv;
+				max = nv > max ? nv : max;
+			}
+			
+			//	this isn't gonna work
+			//	max number determines the left position and the width
+			//	basic width is 25%. 
+			const l = max < 2 ? 1 : max;
+			eventElement.style.left = (l - 1) + "00%";
+			eventElement.style.width = "25%";
 		}
 	}
 }
