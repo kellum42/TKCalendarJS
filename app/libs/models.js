@@ -69,7 +69,6 @@ class EventManager {
 			const e = allEvents[i];
 			const d = new Date(e.start);
 			if (d.getFullYear() === year && d.getMonth() === month && d.getDate() === day){
-				console.log("got here");
 				events.push(e);
 			} 
 		}

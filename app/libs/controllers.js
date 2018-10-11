@@ -71,7 +71,6 @@ class WeekController extends Controller {
 		
 		this._view.onEventClick = function(id) {
 			//	on event click
-			console.log(id);
 		} 
 	}
 	
