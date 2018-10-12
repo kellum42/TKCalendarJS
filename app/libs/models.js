@@ -81,6 +81,17 @@ class EventManager {
 	  	}
 	  	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 	}
+	
+	style(numItems, position) {
+		//	return object with width, left style properties
+		//	1-5: 20%, 6: 100/6, 7: 100/7, so on and so forth
+		const w = numItems < 6 ? 20 : 100 / numItems;
+		const l = (position - 1) * w;
+		return {
+			width: w + "%",
+			left: l + "%" 
+		}
+	}
 }
 
 class Event {
@@ -142,11 +153,11 @@ class Event {
 	span(){
 		const length = parseInt(this.height().slice(0,-1));
 		const increments = parseInt(length / 25); // number of 15 min increments the event has
-		const comps = this.startTime().split(" ");
-		var h = comps[0].split(":")[0];
+		const comps = this.startTime().split(" ");	// components of start time (hours, mins, am/pm)
+		var h = parseInt(comps[0].split(":")[0]);
 		const m = comps[0].split(":")[1];
 		const ap = comps[1];
-		h = ap === "am" ? h : h + 12;
+		h = ap === "pm" && h !== 12 ? h + 12 : h;
 		var start = (h * 60 + parseInt(m)) / 60;
 		start = start * 4;	// convert to integer -> each 15 mins = 1
 		var arr = [];

@@ -112,6 +112,7 @@ class WeekView extends View {
 		
 		var map = {};
 		
+		//	loop through all events for this day
 		for (var i=0;i<events.length;i++) {
 			const event = new Event(events[i]);
 			const eventElement = event.html();
@@ -119,37 +120,38 @@ class WeekView extends View {
 			refCell.appendChild(eventElement);
 						
 			const increments = event.span();
+			console.log(increments);
 			for (var j=0;j<increments.length;j++) {
 				const v = map[increments[j]];
 				const nv = v || [];
-				nv.push(event);
+				nv.push(eventElement);
 				map[increments[j]] = nv;
-// 				max = nv > max ? nv : max;
 			}
-			
-			//	this isn't gonna work
-			//	max number determines the left position and the width
-			//	basic width is 25%. 
-			//const l = max < 2 ? 1 : max;
-			//eventElement.style.left = (l - 1) + "00%";
 		}
+				
+// 		console.log(map);
 		
 		//	loop through map
 		for (var key in map) {
 			if (map.hasOwnProperty(key)) {
-				const arr = map[key];
+				const arr = map[key];	// array of event elements
 				const max = arr.length;
 				for (var j=0;j<arr.length;j++) {
 					const e = arr[j];
-					console.log(e);
-					const p = e.dataset.position;
-					if (p) {
-						if (max > p) {
-							e.dataset.position = max;
+					const n = e.dataset.numItems;
+					if (n){
+						if (max > n) {
+							e.dataset.numItems = max;
+							e.dataset.position = j + 1;
 						}
 					} else {
-						e.dataset.positon = 1;
+						e.dataset.numItems = 1;
+						e.dataset.position = 1;
 					}
+					
+					const styles = model._eventManager.style(e.dataset.numItems, e.dataset.position);
+					e.style.width = styles.width;
+					e.style.left = styles.left;
 				}
 		   	}
 		}
