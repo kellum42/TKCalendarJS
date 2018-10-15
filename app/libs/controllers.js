@@ -26,7 +26,7 @@ class Controller {
 		self._leftIcon.innerHTML = "";
 		self._leftIcon.onclick = "";
 		
-		self._rightIcon.innerHTML = "Add Event";
+		self._rightIcon.innerHTML = "<img src='imgs/red-plus.svg'/>";
 		self._rightIcon.onclick = function(){
 			window.location.hash = window.location.hash + "?ae";
 		}	
@@ -57,7 +57,7 @@ class MonthsController extends Controller {
 	
 	setHeaderFooterItems(){
 		const self = this;
-		self._leftIcon.innerHTML = "< " + self._model._year;
+		self._leftIcon.innerHTML = "<img src='imgs/red-back-arrow.svg' /><span>" + self._model._year + "</span>";
 		self._leftIcon.onclick = function(){
 			window.location.hash = self._model._year;
 		}
@@ -76,7 +76,7 @@ class WeekController extends Controller {
 	
 	setHeaderFooterItems(){
 		const self = this;
-		self._leftIcon.innerHTML = "< " + self._model.monthAbbreviation(self._model._month);
+		self._leftIcon.innerHTML = "<img src='imgs/red-back-arrow.svg' /><span>" + self._model.monthAbbreviation(self._model._month) + "</span>";
 		self._leftIcon.onclick = function(){
 			window.location.hash = self._model._year + "/" + self._model._month;
 		}
@@ -85,38 +85,100 @@ class WeekController extends Controller {
 	load() {
 		super.load();
 		
-		var mySwiper = new Swiper ('.swiper-container', {
-			// Optional parameters
-			direction: 'horizontal',
-			loop: true,
+		const self = this;
+		const div = self._view.generateDayHTML(self._model._eventManager, self._model.getDate());
+		this._view._sliderElement.appendChild(div);
+		
+		const swiper = new Swiper('.swiper-container');
+		
+		self.generateSurroundingDays(self._model, self._view, swiper);
+		
+		//	forward slide	
+		swiper.on('slideNextTransitionEnd', function(){
+			self._model.addDaysToDate(1); //	updates the date on the model
+			self._view.setWeekdayNumbers(self._model);
+			self.generateSurroundingDays(self._model, self._view, this);
+			console.log(self._model.getDate());
+		});
+		
+		//	backwards slide
+		swiper.on('slidePrevTransitionEnd', function(){
+			self._model.addDaysToDate(-1);	//	updates the date on the model
+			self._view.setWeekdayNumbers(self._model);
+			self.generateSurroundingDays(self._model, self._view, this);
+			console.log(self._model.getDate());
+		});
+		
+		self._view.tappedDateInWeekdayList = function(newDate, direction){
 			
-			// If we need pagination
-			pagination: {
-			  el: '.swiper-pagination',
-			},
+			//	change the next/prev slide to the given day
+			//	transition to that slide
+			//	change the outside slides and remove the other othes
 			
-			// Navigation arrows
-			navigation: {
-			  nextEl: '.swiper-button-next',
-			  prevEl: '.swiper-button-prev',
-			},
+			const div = self._view.generateDayHTML(self._model._eventManager, newDate);
+			const currentIndex = swiper.realIndex;
+			const newIndex = direction === "back" ? currentIndex - 1 : currentIndex + 1;
+			const offset = direction === "back" ? 1 : -1;
 			
-			// And if we need scrollbar
-			scrollbar: {
-			  el: '.swiper-scrollbar',
-			},
-		})
+			//	account for the transition adding/subtracting a day
+			self._model.setDate(newDate.addDays(offset));
+			
+			if (newIndex < 0) {
+				swiper.prependSlide(div);
+				swiper.slidePrev();
+				
+			} else if (newIndex >= swiper.slides.length) {
+				swiper.appendSlide(div);
+				swiper.slideNext();
+				
+			} else {
+				swiper.slides[newIndex] = div;
+				swiper.slideTo(newIndex);
+			}
+		}
+	}
+	
+	generateSurroundingDays(model, view, swiper){
+		var previousSlideSet = false;
+		var nextSlideSet = false;
+		
+		const p = view.generateDayHTML(model._eventManager, model.getDate().addDays(-1));
+		const n = view.generateDayHTML(model._eventManager, model.getDate().addDays(1));
+		
+		const index = swiper.realIndex;
+		
+		if (index === 0) {
+			swiper.prependSlide(p);
+			previousSlideSet = true;
+		} 
+		
+		if (index >= swiper.slides.length) {
+			swiper.appendSlide(n);
+			nextSlideSet = true;
+		}
+		
+		if (!previousSlideSet) {
+			swiper.slides[index - 1] = p;
+		}
+		
+		if (!nextSlideSet) {
+			swiper.slides[index + 1] = n;
+		}
+		
+		swiper.update();
 	}
 }
 
 class Popup extends Controller {
 	constructor(el, name, view, model) {
+		el = document.body;
 		super(el, name, view, model);
 		const self = this;
-		this._view._element.classList.add("modal");
+		
+		view._element.classList.add("modal");
 		
 		//	add overlay
-		const o = this._overlay = document.createElement("div");
+		const o = self._overlay = document.createElement("div");
 		o.id = "overlay";
 		o.onclick = function(){
 			window.location.hash = window.location.hash.replace("?ae", "");	// dismisses the controller
@@ -128,6 +190,11 @@ class Popup extends Controller {
 		}, 100);
 	}
 	
+	load(){
+		this._view.refreshHTML(this._model);
+		//	removed set headers for popups	
+	}
+	
 	dismiss(){
 		const self = this;
 		const o = document.querySelector("#overlay");
@@ -136,7 +203,7 @@ class Popup extends Controller {
 		v.style.right = "-300px";
 		setTimeout(function(){
 			document.body.removeChild(o);			
-			self._element.removeChild(v);
+			document.body.removeChild(v);
 		
 		}, 300);
 	}
@@ -208,6 +275,10 @@ class AddEventPopup extends Popup {
 	dismiss(){
 		this._startDatepicker.close(); // closes datepicker whenever view is dismissed
 		this._endDatepicker.close();
+		
+		this._startDatepicker.kill();
+		this._endDatepicker.kill();
+		
 		super.dismiss();
 	}
 	

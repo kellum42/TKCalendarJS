@@ -28,6 +28,25 @@ class Model {
 		return [year, year + 1, year + 2];
 	}
 	
+	getDate(){
+		const y = this._year || this._year === 0 ? this._year : this._currentYear;
+		const m = this._month || this._month === 0 ? this._month : this._currentMonth;
+		const d = this._day || this._day === 0 ? this._day : 1;
+		return new Date(y, m, d, 0, 0, 0);
+	}
+	
+	setDate(date){
+		this._year = date.getFullYear();
+		this._month = date.getMonth();
+		this._day = date.getDate();
+	}
+	
+	addDaysToDate(days) {
+		const d = this.getDate();
+		const n = d.addDays(days);
+		this.setDate(n);
+		return n;
+	}
 	//	events structure
 	//	id, name, start date, end date, description,
 	

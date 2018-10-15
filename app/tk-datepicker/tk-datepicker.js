@@ -249,6 +249,10 @@
 			return el;
 		}
 		
+		kill(){
+			document.body.removeChild(this._datepickerElement);
+		}
+		
 		open(){
 			this._isOpen = true;
 			this.refreshBanner();

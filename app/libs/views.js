@@ -1,4 +1,4 @@
-class View {
+class View {	
 	hide(){
 		this._element.style.opacity = 0;
 	}
@@ -15,7 +15,8 @@ class YearsView extends View {
 		for (var i=0;i<model.years().length;i++) {
 			const year = model.years()[i];
 			
-			html += "<div class='year'><h3>" + year + "</h3><div class='months-wrapper'>";
+			const selected = parseInt(year) === parseInt(model._currentYear) ? "selected" : "";
+			html += "<div class='year'><h3 class='" + selected + "'>" + year + "</h3><div class='months-wrapper'>";
 			
 			for (var j=0;j<12;j++) {
 				const month = j;
@@ -25,13 +26,14 @@ class YearsView extends View {
 				if (!numDays || (!offset && offset !== 0)) {
 					continue;
 				}
-	
-				html += "<a class='month' href='#" + year + "/" + month + "'><h4>" + model.monthAbbreviation(month) + "</h4><div class='days'>";
+				
+				const selectedMonth = year === model._currentYear && model._currentMonth === month ? "selected" : "";
+				html += "<a class='month' href='#" + year + "/" + month + "'><h4 class='" + selectedMonth + "'>" + model.monthAbbreviation(month) + "</h4><div class='days'>";
 				
 				for(let k=0;k<42;k++) {
 					const day = (k + 1) - offset;
 					const l = (day > 0 && day <= numDays) ? day : "";
-					const todayClass = (month === this._currentMonth && year === this._currentYear && this._currentDay === l) ? "class='today'" : "" ;
+					const todayClass = (month === model._currentMonth && year === model._currentYear && model._currentDay === l) ? "class='today'" : "" ;
 					html += "<span " + todayClass + ">" + l + "</span>";
 				}
 				html += "<section style='clear:both'></section></div></a>";
@@ -47,9 +49,9 @@ class MonthsView extends View {
 
 	refreshHTML(model){
 		
-		const year = model._year;
+		const year = parseInt(model._year);
 		var html = "<div style='overflow-y:hidden' class='view-content-wrapper'>";
-		html += "<div class='weekday-list'><div style='color:grey'>S<span>unday</span></div><div>M<span>onday</span></div><div>T<span>uesday</span></div><div>W<span>ednesday</span></div><div>T<span>hursday</span></div><div>F<span>riday</span></div><div style='color:grey'>S<span>aturday</span></div></div><div id='months-expanded-container'>";
+		html += "<div class='weekday-list'><div style='color:#bfbfbf'>S<span>unday</span></div><div>M<span>onday</span></div><div>T<span>uesday</span></div><div>W<span>ednesday</span></div><div>T<span>hursday</span></div><div>F<span>riday</span></div><div style='color:#bfbfbf'>S<span>aturday</span></div></div><div id='months-expanded-container'>";
 		
 		for (var j=0;j<12;j++) {
 			const month = j;
@@ -59,17 +61,33 @@ class MonthsView extends View {
 			if (!numDays || (!offset && offset !== 0)) {
 				continue;
 			}
-
-			html += "<div class='month-expanded'><h4>" + model.monthAbbreviation(month) + "</h4><div class='days'>";
+			
+			const selectedMonth = year === model._currentYear && model._currentMonth === month ? "selected" : "";
+			html += "<div class='month-expanded'><h4 class='" + selectedMonth + "'>" + model.monthAbbreviation(month) + "</h4><div class='days'>";
 			
 			for(let k=0;k<42;k++) {
 				const day = (k + 1) - offset;
-				const l = (day > 0 && day <= numDays) ? day : "";
+				if (day > numDays) { continue; }	// to avoid the extra white space
+				const l = (day > 0) ? day : "";
+				
+				var events = [];
+				if (l) {
+					events = model._eventManager.eventsForDay(parseInt(year), parseInt(month), parseInt(l));
+				}
+				
 				const dayOfWeek = new Date(year, month, l).getDay();
 				const greyClass = (dayOfWeek === 0 || dayOfWeek === 6) ? " grey" : "";
 				const todayClass = (year == model._currentYear && month === model._currentMonth && l == model._currentDay) ? "today" : "" ;
 				const link = l ? "href='#" + year + "/" + month + "/" + l + "'" : "data-disabled";
-				html += "<a " + link + "><p class=" + todayClass + greyClass + "><span>" + l + "</span></p><div class='events'></div></a>";
+				const hasEvents = events.length > 0 ? " data-has-events " : ""
+				html += "<a " + link + hasEvents + "><p class=" + todayClass + greyClass + "><span>" + l + "</span></p><div class='events'>";
+				
+				//	add events here
+				for (var i=0;i<events.length;i++) {
+					html += "<div class='event purple'><p>" + events[i].name + "</p></div>";
+				}	
+				
+				html += "</div></a>";
 			}
 			html += "<section style='clear:both'></section></div></div>";
 		}
@@ -77,17 +95,72 @@ class MonthsView extends View {
 		html += "</div>";
 		this._element.innerHTML = html;
 		
+		//	generate the events
+		
+		
 		//	scroll to selected month functionality
 		const month = document.querySelectorAll(".month-expanded")[model._month];
-		const offsetY = month.offsetTop - 30 // month y pos - (month heading height + any extra padding)
+		const offsetY = month.offsetTop - 45 // month y pos - (month heading height + any extra padding)
 		this._element.querySelector("#months-expanded-container").scrollTop = offsetY || 0;
 	}
 }
 
+//	when day is displayed, automatically load divs for days before and after current date
+//	whenever date changes, load the outside divs for days
 class WeekView extends View {
+	
 	refreshHTML(model) {
-		var html = "<div class='view-content-wrapper'><div id='swiper' style='overflow:hidden'><div class='day-wrapper'>";
+		//	loads the current day
+		//	also loads the divs for the day before, and the day after
+		const self = this;
+		self._element.innerHTML = "<div class='view-content-wrapper' style='overflow:hidden'><div class='day-info'><div><div class='weekday-list'><div style='color:#bfbfbf'>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div style='color:#bfbfbf'>S</div></div><div class='weekday-numbers'><div></div><div></div><div></div><div class='selected'></div><div></div><div></div><div></div></div><div class='today'>Monday October 15, 2018</div></div></div><div class='swiper-container'><div class='swiper-wrapper'></div></div></div>";
+		self._sliderElement = self._element.querySelector(".swiper-wrapper");
+		self._weekdayHeader = self._element.querySelector(".weekday-numbers");
 		
+		self.setWeekdayNumbers(model);
+	}
+	
+	setWeekdayNumbers(model) {
+		const self = this;
+		
+		const dayOfWeek = model.getDate().getDay();
+			
+		const divs = self._weekdayHeader.querySelectorAll("div");
+		for (var i=0;i<divs.length;i++) {
+			const div = divs[i];
+			div.innerHTML = "";
+			
+			const diff = i - dayOfWeek;
+			const nd = model.getDate().addDays(diff);
+			const thisDate = nd.getDate();
+			const span = document.createElement("span");
+			span.innerHTML = thisDate;
+			span.classList.add("hover");
+			span.onclick = function(){
+				if (diff === 0) { return; }
+				const d = diff > 0 ? "forward" : "back";
+				self.tappedDateInWeekdayList(nd, d);
+			}
+			div.appendChild(span);
+			
+			if (i === dayOfWeek) {
+				div.classList.add("selected");
+			
+			} else {
+				div.classList.remove("selected");	
+			}
+		}			
+	}
+	
+	generateDayHTML(manager, date){
+		const y = date.getFullYear();
+		const m = date.getMonth();
+		const d = date.getDate();
+		
+		const div = document.createElement("div");
+		div.classList.add("swiper-slide");
+		
+		var html = "<div class='day-wrapper'>";
 		for (var i=0;i<24;i++) {
 			const ref = i === 0 ? "class='reference-cell'" : "";
 			const j = (i >= 12 ) ? i - 12 : i;
@@ -103,12 +176,11 @@ class WeekView extends View {
 			const k = t + (t === "noon" ? "" : ap);
 			html += "<div class='cell'><div><p>" + k + "</p></div><div " + ref + "></div></div>";
 		}
+		html += "</div>";
+		div.innerHTML = html;
 		
-		html += "</div></div></div>";
-		this._element.innerHTML = html;
-		
-		const refCell = this._element.querySelector(".reference-cell");
-		const events = model._eventManager.eventsForDay(parseInt(model._year), parseInt(model._month), parseInt(model._day));
+		const refCell = div.querySelector(".reference-cell");
+		const events = manager.eventsForDay(parseInt(y), parseInt(m), parseInt(d));
 		
 		var map = {};
 		
@@ -120,7 +192,6 @@ class WeekView extends View {
 			refCell.appendChild(eventElement);
 						
 			const increments = event.span();
-			console.log(increments);
 			for (var j=0;j<increments.length;j++) {
 				const v = map[increments[j]];
 				const nv = v || [];
@@ -129,7 +200,6 @@ class WeekView extends View {
 			}
 		}
 				
-// 		console.log(map);
 		
 		//	loop through map
 		for (var key in map) {
@@ -149,12 +219,13 @@ class WeekView extends View {
 						e.dataset.position = 1;
 					}
 					
-					const styles = model._eventManager.style(e.dataset.numItems, e.dataset.position);
+					const styles = manager.style(e.dataset.numItems, e.dataset.position);
 					e.style.width = styles.width;
 					e.style.left = styles.left;
 				}
 		   	}
 		}
+		return div;
 	}
 }
 
