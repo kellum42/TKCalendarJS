@@ -47,8 +47,15 @@ class Model {
 		this.setDate(n);
 		return n;
 	}
-	//	events structure
-	//	id, name, start date, end date, description,
+	
+	dateStringFormat(){
+		const d = this.getDate();
+		if (!d) { return ""; }
+		
+		const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+		const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+		return days[d.getDay()] + " " + months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
+	}
 	
 }
 

@@ -309,6 +309,9 @@
 	    top: 0;
 	    left: 0;
 	}
+	.swiper-container {
+		height: calc(100% - 100px);
+	}
 	.swiper-slide {
       	overflow-y: scroll;
     }

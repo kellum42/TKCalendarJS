@@ -98,7 +98,6 @@ class WeekController extends Controller {
 			self._model.addDaysToDate(1); //	updates the date on the model
 			self._view.setWeekdayNumbers(self._model);
 			self.generateSurroundingDays(self._model, self._view, this);
-			console.log(self._model.getDate());
 		});
 		
 		//	backwards slide
@@ -106,65 +105,55 @@ class WeekController extends Controller {
 			self._model.addDaysToDate(-1);	//	updates the date on the model
 			self._view.setWeekdayNumbers(self._model);
 			self.generateSurroundingDays(self._model, self._view, this);
-			console.log(self._model.getDate());
 		});
 		
 		self._view.tappedDateInWeekdayList = function(newDate, direction){
-			
-			//	change the next/prev slide to the given day
-			//	transition to that slide
-			//	change the outside slides and remove the other othes
-			
 			const div = self._view.generateDayHTML(self._model._eventManager, newDate);
-			const currentIndex = swiper.realIndex;
-			const newIndex = direction === "back" ? currentIndex - 1 : currentIndex + 1;
 			const offset = direction === "back" ? 1 : -1;
 			
 			//	account for the transition adding/subtracting a day
 			self._model.setDate(newDate.addDays(offset));
 			
-			if (newIndex < 0) {
+			self.removeAllSlidesExceptActive(swiper);
+			
+			if (direction === "back") {
 				swiper.prependSlide(div);
+				swiper.update();
 				swiper.slidePrev();
 				
-			} else if (newIndex >= swiper.slides.length) {
-				swiper.appendSlide(div);
-				swiper.slideNext();
-				
 			} else {
-				swiper.slides[newIndex] = div;
-				swiper.slideTo(newIndex);
+				swiper.appendSlide(div);
+				swiper.update();
+				swiper.slideNext();
 			}
 		}
 	}
 	
 	generateSurroundingDays(model, view, swiper){
-		var previousSlideSet = false;
-		var nextSlideSet = false;
+		this.removeAllSlidesExceptActive(swiper);
 		
 		const p = view.generateDayHTML(model._eventManager, model.getDate().addDays(-1));
+		swiper.prependSlide(p);
+		
 		const n = view.generateDayHTML(model._eventManager, model.getDate().addDays(1));
+		swiper.appendSlide(n);
 		
-		const index = swiper.realIndex;
+		swiper.update();
+	}
+	
+	removeAllSlidesExceptActive(swiper){
+		const slides = swiper.slides;
+		const currentIndex = swiper.realIndex;
 		
-		if (index === 0) {
-			swiper.prependSlide(p);
-			previousSlideSet = true;
-		} 
-		
-		if (index >= swiper.slides.length) {
-			swiper.appendSlide(n);
-			nextSlideSet = true;
+		var removals = [];
+		//	remove all slides except for active
+		for (var i=0;i<slides.length;i++) {
+			if (i !== currentIndex) {
+				removals.push(i);
+			}	
 		}
 		
-		if (!previousSlideSet) {
-			swiper.slides[index - 1] = p;
-		}
-		
-		if (!nextSlideSet) {
-			swiper.slides[index + 1] = n;
-		}
-		
+		swiper.removeSlide(removals);
 		swiper.update();
 	}
 }

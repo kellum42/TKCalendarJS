@@ -116,14 +116,16 @@ class WeekView extends View {
 		self._element.innerHTML = "<div class='view-content-wrapper' style='overflow:hidden'><div class='day-info'><div><div class='weekday-list'><div style='color:#bfbfbf'>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div style='color:#bfbfbf'>S</div></div><div class='weekday-numbers'><div></div><div></div><div></div><div class='selected'></div><div></div><div></div><div></div></div><div class='today'>Monday October 15, 2018</div></div></div><div class='swiper-container'><div class='swiper-wrapper'></div></div></div>";
 		self._sliderElement = self._element.querySelector(".swiper-wrapper");
 		self._weekdayHeader = self._element.querySelector(".weekday-numbers");
+		self._todayElement = self._element.querySelector(".today");
 		
 		self.setWeekdayNumbers(model);
 	}
 	
 	setWeekdayNumbers(model) {
 		const self = this;
-		
 		const dayOfWeek = model.getDate().getDay();
+		
+		self._todayElement.innerHTML = model.dateStringFormat();
 			
 		const divs = self._weekdayHeader.querySelectorAll("div");
 		for (var i=0;i<divs.length;i++) {
