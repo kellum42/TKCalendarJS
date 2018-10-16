@@ -154,6 +154,9 @@ class WeekView extends View {
 		}			
 	}
 	
+	//	generate html for both week and day on every swipe/move
+	//	just store them in different wrappers (day vs week)
+	//	store "weekNum" variable in the model (will have to find the weeks of year somehow) 
 	generateDayHTML(manager, date){
 		const y = date.getFullYear();
 		const m = date.getMonth();

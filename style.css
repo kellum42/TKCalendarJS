@@ -349,4 +349,10 @@
 	.year > .months-wrapper .month {
 		width: 12.667%;
 	}
+	.day-wrapper, .day-info {
+		display:none;
+	}
+	.swiper-container {
+		height: 100%;
+	}
 }

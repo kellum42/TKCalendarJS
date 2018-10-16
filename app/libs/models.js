@@ -12,6 +12,8 @@ class Model {
 		this._scrollPosition;
 		this._validator = new Validator();
 		this._eventManager = new EventManager();
+		
+		this._wdBreakpoint = 900; // make sure this matches up with the css
 	}
 	
 	monthAbbreviation(month) {
