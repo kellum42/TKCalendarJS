@@ -315,6 +315,9 @@
 	.swiper-slide {
       	overflow-y: scroll;
     }
+    .week-wrapper {
+		display: none;
+	}
 }
 
 @media only screen and (min-width: 550px) {
@@ -354,5 +357,71 @@
 	}
 	.swiper-container {
 		height: 100%;
+	}
+	.week-wrapper {
+		display: block;
+	}
+	.week-wrapper > .week-info {
+		height: 50px;
+		background: orange;
+	}
+	.week-wrapper > .week {
+		height: calc(100% - 50px);
+		position: relative;
+	}
+	.week-wrapper > .week > .week-day-titles {
+		height: 70px;
+		padding-left: 50px;
+		border-bottom: 1px solid grey;
+		/* 		background: green; */
+	}
+	.week-wrapper > .week > .week-day-titles > div {
+		display:inline-block;
+		width: calc(100%/7);
+		margin: 0;	
+		padding: 5px 20px;
+		box-sizing: border-box;
+		vertical-align: top;
+		border-right: 1px solid grey;
+	}
+	.week-wrapper > .week > .week-day-titles > div > p:nth-of-type(1) {
+		font-size: 14px;
+		margin: 5px 0px;
+	}
+	.week-wrapper > .week > .week-day-titles > div > p:nth-of-type(2) {
+		font-size: 28px;
+		margin: 0px;
+	}
+	.week-wrapper > .week > .week-events-wrapper {
+		height: calc(100% - 70px);
+/* 		background: red; */
+		overflow-y: scroll;
+		position: relative;
+	}
+	.week-wrapper > .week > .week-events-wrapper > .day-times {
+		position: absolute;
+		width: 50px;
+		left: 0;
+		top: 0;
+		/* background: green; */
+		height: 100%;
+	}
+	.week-wrapper > .week > .week-events-wrapper > .week-events {
+		margin-left: 50px;
+		box-sizing: border-box;
+	}
+	.week-wrapper > .week > .week-events-wrapper > .week-events > div {
+/* 		height: 900px; */
+		width: calc(100%/7);
+		border-right: 1px grey solid;
+		display:inline-block;
+		margin: 0;
+		box-sizing: border-box;
+		float:left;
+	}
+	.week-wrapper > .week > .week-events-wrapper > .week-events > div > span {
+		height: 60px;
+		display:block;
+		border-bottom: 1px solid grey;
 	}
 }

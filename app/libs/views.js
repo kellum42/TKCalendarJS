@@ -165,7 +165,10 @@ class WeekView extends View {
 		const div = document.createElement("div");
 		div.classList.add("swiper-slide");
 		
-		var html = "<div class='day-wrapper'>";
+		div.innerHTML = "<div class='week-wrapper'><div class='week-info'>Date info</div><div class='week'><div class='week-day-titles'><div><p>Sun</p><p>15</p></div><div><p>Mon</p><p>16</p></div><div><p>Tues</p><p>17</p></div><div><p>Wed</p><p>18</p></div><div><p>Thurs</p><p>19</p></div><div><p>Fri</p><p>20</p></div><div><p>Sat</p><p>21</p></div></div><div class='week-events-wrapper'><div class='day-times'></div><div class='week-events'><div><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div></div></div><div class='day-wrapper'></div>";
+		
+		const dw = div.querySelector(".day-wrapper");
+		var html = "";
 		for (var i=0;i<24;i++) {
 			const ref = i === 0 ? "class='reference-cell'" : "";
 			const j = (i >= 12 ) ? i - 12 : i;
@@ -181,10 +184,10 @@ class WeekView extends View {
 			const k = t + (t === "noon" ? "" : ap);
 			html += "<div class='cell'><div><p>" + k + "</p></div><div " + ref + "></div></div>";
 		}
-		html += "</div>";
-		div.innerHTML = html;
+		html += "";
+		dw.innerHTML = html;
 		
-		const refCell = div.querySelector(".reference-cell");
+		const refCell = dw.querySelector(".reference-cell");
 		const events = manager.eventsForDay(parseInt(y), parseInt(m), parseInt(d));
 		
 		var map = {};
