@@ -4,16 +4,20 @@ class Model {
 		this._month;
 		this._day;
 		
-		const today = new Date();
-		this._currentYear = today.getFullYear();
-		this._currentMonth = today.getMonth();
-		this._currentDay = today.getDate();
+		this._today = new Date();
+		this._currentYear = this._today.getFullYear();
+		this._currentMonth = this._today.getMonth();
+		this._currentDay = this._today.getDate();
 		this._events = [];
 		this._scrollPosition;
 		this._validator = new Validator();
 		this._eventManager = new EventManager();
 		
 		this._wdBreakpoint = 900; // make sure this matches up with the css
+		this._abbreviatedMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+		this._fullMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+		this._abbreviatedWeekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+		this._fullWeekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 	}
 	
 	monthAbbreviation(month) {
@@ -54,11 +58,8 @@ class Model {
 		const d = this.getDate();
 		if (!d) { return ""; }
 		
-		const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-		const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-		return days[d.getDay()] + " " + months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
+		return this._fullWeekDays[d.getDay()] + " " + this._fullMonths[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
 	}
-	
 }
 
 class EventManager {
@@ -110,10 +111,11 @@ class EventManager {
 	  	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 	}
 	
-	style(numItems, position) {
+	style(numItems, position, format) {
+		format = format || "day";
 		//	return object with width, left style properties
 		//	1-5: 20%, 6: 100/6, 7: 100/7, so on and so forth
-		const w = numItems < 6 ? 20 : 100 / numItems;
+		const w = format === "week" ? 100 / numItems : numItems < 6 ? 20 : 100 / numItems;
 		const l = (position - 1) * w;
 		return {
 			width: w + "%",

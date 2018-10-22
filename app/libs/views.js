@@ -105,15 +105,19 @@ class MonthsView extends View {
 	}
 }
 
-//	when day is displayed, automatically load divs for days before and after current date
-//	whenever date changes, load the outside divs for days
 class WeekView extends View {
+	
+	constructor(){
+		super();
+		self.didTapPrevWeek;
+		self.didTapNextWeek;
+	}
 	
 	refreshHTML(model) {
 		//	loads the current day
 		//	also loads the divs for the day before, and the day after
 		const self = this;
-		self._element.innerHTML = "<div class='view-content-wrapper' style='overflow:hidden'><div class='day-info'><div><div class='weekday-list'><div style='color:#bfbfbf'>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div style='color:#bfbfbf'>S</div></div><div class='weekday-numbers'><div></div><div></div><div></div><div class='selected'></div><div></div><div></div><div></div></div><div class='today'>Monday October 15, 2018</div></div></div><div class='swiper-container'><div class='swiper-wrapper'></div></div></div>";
+		self._element.innerHTML = "<div class='view-content-wrapper' style='overflow:hidden'><div class='day-info'><div><div class='weekday-list'><div style='color:#bfbfbf'>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div style='color:#bfbfbf'>S</div></div><div class='weekday-numbers'><div></div><div></div><div></div><div class='selected'></div><div></div><div></div><div></div></div><div class='today'></div></div></div><div class='swiper-container'><div class='swiper-wrapper'></div></div></div>";
 		self._sliderElement = self._element.querySelector(".swiper-wrapper");
 		self._weekdayHeader = self._element.querySelector(".weekday-numbers");
 		self._todayElement = self._element.querySelector(".today");
@@ -153,43 +157,130 @@ class WeekView extends View {
 			}
 		}			
 	}
-	
+		
 	//	generate html for both week and day on every swipe/move
 	//	just store them in different wrappers (day vs week)
 	//	store "weekNum" variable in the model (will have to find the weeks of year somehow) 
-	generateDayHTML(manager, date){
-		const y = date.getFullYear();
-		const m = date.getMonth();
-		const d = date.getDate();
+	
+	getPageHTML(model, dayDate, weekDate) {
+		const self = this;
+		weekDate = weekDate || dayDate;
 		
 		const div = document.createElement("div");
 		div.classList.add("swiper-slide");
 		
-		div.innerHTML = "<div class='week-wrapper'><div class='week-info'>Date info</div><div class='week'><div class='week-day-titles'><div><p>Sun</p><p>15</p></div><div><p>Mon</p><p>16</p></div><div><p>Tues</p><p>17</p></div><div><p>Wed</p><p>18</p></div><div><p>Thurs</p><p>19</p></div><div><p>Fri</p><p>20</p></div><div><p>Sat</p><p>21</p></div></div><div class='week-events-wrapper'><div class='day-times'></div><div class='week-events'><div><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div></div></div><div class='day-wrapper'></div>";
+		const weekEl = self.getWeekHTML(model, weekDate);
+		const dayEl = self.getDayHTML(model._eventManager, dayDate);
 		
-		const dw = div.querySelector(".day-wrapper");
-		var html = "";
-		for (var i=0;i<24;i++) {
-			const ref = i === 0 ? "class='reference-cell'" : "";
-			const j = (i >= 12 ) ? i - 12 : i;
-			const ap = (i >= 12) ? " PM" : " AM";
-			var t; 
-			if (j == 0 && i >= 12) {
-				t = "noon";
-			} else if (j ==0 && i < 12) {
-				t = "12";
-			}  else {
-				t = j;
+		div.appendChild(weekEl);
+		div.appendChild(dayEl);
+		
+		return div;
+	}
+	
+	getWeekHTML(model, weekDate) {
+		const self = this;
+		const div = document.createElement("div");
+		div.className = "week-wrapper swiper-no-swiping";
+		div.innerHTML = "<div class='week-info'><div><span class='today'>TODAY</span><div><img class='hover' src='imgs/grey-back-arrow.svg' /></div><div><img class='hover' src='imgs/grey-next-arrow.svg' /></div><p></p></div></div><div class='week'><div class='week-day-titles'></div><div class='week-events-wrapper'><div class='day-times'></div><div class='week-events'></div></div></div>";
+
+		const day = weekDate.getDay();
+		var isCurrentWeek;	// tells if this week is the current week
+		var currentMonth = "";
+		var currentYear = "";
+		
+		//	create columns for days of the week
+		for (var i=0;i<7;i++) {			
+			const offset = i - day;
+			const cd = weekDate.addDays(offset);
+			const d = document.createElement("div");
+			
+			//	set the currentMonth and currentYear equal to the first day of the week's month & year
+			if (i === 0) {
+				currentMonth = model._fullMonths[cd.getMonth()];
+				currentYear = cd.getFullYear();
 			}
-			const k = t + (t === "noon" ? "" : ap);
-			html += "<div class='cell'><div><p>" + k + "</p></div><div " + ref + "></div></div>";
+			
+			if (cd.isToday()) { 
+				d.classList.add("today");
+				isCurrentWeek = true; 
+			}
+			
+			//	create cells for each hour of the day
+			for (var j=0;j<24;j++) {
+				const ref = j === 0 ? "reference-cell" : "";
+				d.innerHTML += "<div class='" + ref + " cell'></div>";
+			}
+			
+			div.querySelector(".week-events").appendChild(d);
+
+			//	populate events
+			const refCell = d.querySelector(".reference-cell");
+			const events = self.eventsInHTMLForDate(cd, model._eventManager, "week");
+			for (var j=0;j<events.length;j++) {
+				refCell.appendChild(events[j]);
+			}
+			
+			//	the names of the days of the week
+			const weekdayTitles = div.querySelector(".week-day-titles");
+			const w = document.createElement("div");
+			w.innerHTML = "<p>" + model._abbreviatedWeekDays[i] + "</p><p>" + cd.getDate() + "</p>";
+			w.className = cd.isToday() ? "today" : "";
+			weekdayTitles.appendChild(w);
 		}
-		html += "";
-		dw.innerHTML = html;
+		div.querySelector(".week-events").innerHTML += "<section style='clear:both'></section>";
 		
-		const refCell = dw.querySelector(".reference-cell");
-		const events = manager.eventsForDay(parseInt(y), parseInt(m), parseInt(d));
+		//	the times on the side of the columns
+		const weekTimes = div.querySelector(".day-times");
+		const times = self.dayTimesList();
+		for (var i=0;i<times.length;i++) {
+			weekTimes.innerHTML += "<div><p>" + times[i] + "</p></div>"
+		}
+				
+		//	set month on top
+		div.querySelector(".week-info > div > p").innerText = currentMonth + " " + currentYear;
 		
+		//	set today label
+		div.querySelector(".week-info .today").style.display = isCurrentWeek ? "inline-block" : "none";
+		
+		//	directional arrows event listeners
+		const directions = div.querySelectorAll("img");
+		directions[0].onclick = function(){
+			self.didTapPrevWeek();
+		}
+		directions[1].onclick = function(){
+			self.didTapNextWeek();
+		}
+		return div;
+	}
+	
+	getDayHTML(manager, date) {
+		const self = this;
+		const div = document.createElement("div");
+		div.className = "day-wrapper";
+
+		const times = self.dayTimesList();
+		for (var i=0;i<times.length;i++) {
+			const ref = i === 0 ? "class='reference-cell'" : "";
+			div.innerHTML += "<div class='cell'><div><p>" + times[i] + "</p></div><div " + ref + "></div></div>";
+		}
+		
+		const refCell = div.querySelector(".reference-cell");
+		const eventsHTML = self.eventsInHTMLForDate(date, manager);
+		for (var i=0;i<eventsHTML.length;i++) {
+			refCell.appendChild(eventsHTML[i]);
+		}
+		
+		return div;
+	}
+		
+	eventsInHTMLForDate(date, manager, format) {
+		var eventsArr = [];	// array to hold the events html 
+		const year = date.getFullYear();
+		const month = date.getMonth();
+		const day = date.getDate();
+		
+		const events = manager.eventsForDay(parseInt(year), parseInt(month), parseInt(day));
 		var map = {};
 		
 		//	loop through all events for this day
@@ -197,7 +288,6 @@ class WeekView extends View {
 			const event = new Event(events[i]);
 			const eventElement = event.html();
 			eventElement.onclick = this.onEventClick(event._id);
-			refCell.appendChild(eventElement);
 						
 			const increments = event.span();
 			for (var j=0;j<increments.length;j++) {
@@ -206,9 +296,9 @@ class WeekView extends View {
 				nv.push(eventElement);
 				map[increments[j]] = nv;
 			}
+			eventsArr.push(eventElement);
 		}
 				
-		
 		//	loop through map
 		for (var key in map) {
 			if (map.hasOwnProperty(key)) {
@@ -227,13 +317,31 @@ class WeekView extends View {
 						e.dataset.position = 1;
 					}
 					
-					const styles = manager.style(e.dataset.numItems, e.dataset.position);
+					const styles = manager.style(e.dataset.numItems, e.dataset.position, format);
 					e.style.width = styles.width;
 					e.style.left = styles.left;
 				}
 		   	}
 		}
-		return div;
+		return eventsArr;
+	}
+		
+	dayTimesList(){
+		var obj = [];
+		for (var i=0;i<24;i++) {
+			const j = (i >= 12 ) ? i - 12 : i;
+			const ap = (i >= 12) ? " PM" : " AM";
+			var t; 
+			if (j == 0 && i >= 12) {
+				t = "noon";
+			} else if (j ==0 && i < 12) {
+				t = "12 " + ap;
+			}  else {
+				t = j + " " + ap;
+			}
+			obj.push(t);
+		}
+		return obj;
 	}
 }
 
@@ -241,7 +349,7 @@ class AddEventView extends View {
 		
 	refreshHTML(model) {
 		const self = this;
-		var html = "<div class='view-content-wrapper'><h1>add event</h1><div><div><p>Name</p><input type='text' id='event-name' /></div><div><p>Start Date</p><input type='text' id='event-start' /></div><div><p>End Date</p><input type='text' id='event-end' /></div><div><p>Description</p><textarea id='add-event-description'></textarea></div></div><div><button type='button'>Add Event</button</div></div>";
+		var html = "<div class='view-content-wrapper'><h2>New Event</h2><div><div class='input-group'><p>Name</p><input type='text' id='event-name' /></div><div class='input-group'><p>Start Date</p><input type='text' id='event-start' /></div><div class='input-group'><p>End Date</p><input type='text' id='event-end' /></div><div class='input-group'><p>Description</p><textarea id='add-event-description'></textarea></div></div><div><button type='button' class='button hover'>Add Event</button</div></div>";
 		self._element.innerHTML = html;
 		
 		self._eventName = self._element.querySelector("#event-name");

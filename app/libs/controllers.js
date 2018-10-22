@@ -85,35 +85,33 @@ class WeekController extends Controller {
 	load() {
 		super.load();
 		
-		const self = this;
-		const div = self._view.generateDayHTML(self._model._eventManager, self._model.getDate());
-		this._view._sliderElement.appendChild(div);
+		const self = this;		
+		const div = self._view.getPageHTML(self._model, self._model.getDate());
+		self._view._sliderElement.appendChild(div);
 		
 		const swiper = new Swiper('.swiper-container');
-		
-		self.generateSurroundingDays(self._model, self._view, swiper);
-		
-		//	forward slide	
+		swiper.prependSlide(self._view.getPageHTML(self._model, self._model.addDaysToDate(-1)));	// make previous slide
+		swiper.appendSlide(self._view.getPageHTML(self._model, self._model.addDaysToDate(1)));	// make next slide
+		swiper.update();
+				
+		//	on swipe gesture - forward slide (can only swipe on days - can't swipe weeks)	
 		swiper.on('slideNextTransitionEnd', function(){
 			self._model.addDaysToDate(1); //	updates the date on the model
 			self._view.setWeekdayNumbers(self._model);
-			self.generateSurroundingDays(self._model, self._view, this);
+			self.setBoundaryPages(this);
 		});
 		
-		//	backwards slide
+		//	on swipe gesture - backwards slide (can only swipe on days - can't swipe weeks)	
 		swiper.on('slidePrevTransitionEnd', function(){
 			self._model.addDaysToDate(-1);	//	updates the date on the model
 			self._view.setWeekdayNumbers(self._model);
-			self.generateSurroundingDays(self._model, self._view, this);
+			self.setBoundaryPages(this);
 		});
-		
+
 		self._view.tappedDateInWeekdayList = function(newDate, direction){
-			const div = self._view.generateDayHTML(self._model._eventManager, newDate);
-			const offset = direction === "back" ? 1 : -1;
 			
-			//	account for the transition adding/subtracting a day
-			self._model.setDate(newDate.addDays(offset));
-			
+			self._model.setDate(newDate.addDays( direction === "forward" ? -1 : 1 ));	// account for day added/subtracted in the callback
+			const div = self._view.getPageHTML(self._model, newDate);
 			self.removeAllSlidesExceptActive(swiper);
 			
 			if (direction === "back") {
@@ -127,15 +125,41 @@ class WeekController extends Controller {
 				swiper.slideNext();
 			}
 		}
+
+		
+		self._view.didTapPrevWeek = function() {
+			const newDate = self._model.getDate().addDays(-7);
+			const div = self._view.getPageHTML(self._model, newDate);
+			
+			self.removeAllSlidesExceptActive(swiper);
+			swiper.prependSlide(div);
+			
+			self._model.setDate(newDate.addDays(1));	// account for day added/subtracted in the callback
+			swiper.update();
+			swiper.slidePrev();
+		}
+		
+		self._view.didTapNextWeek = function() {
+			const newDate = self._model.getDate().addDays(7);
+			const div = self._view.getPageHTML(self._model, newDate);
+			
+			self.removeAllSlidesExceptActive(swiper);
+			swiper.appendSlide(div);
+			
+			self._model.setDate(newDate.addDays(-1));	// account for day added/subtracted in the callback
+			swiper.update();
+			swiper.slideNext();
+		}
 	}
 	
-	generateSurroundingDays(model, view, swiper){
-		this.removeAllSlidesExceptActive(swiper);
-		
-		const p = view.generateDayHTML(model._eventManager, model.getDate().addDays(-1));
+	setBoundaryPages(swiper){
+		const self = this;
+		self.removeAllSlidesExceptActive(swiper);
+	
+		const p = self._view.getPageHTML(self._model, self._model.getDate().addDays(-1));
 		swiper.prependSlide(p);
 		
-		const n = view.generateDayHTML(model._eventManager, model.getDate().addDays(1));
+		const n = self._view.getPageHTML(self._model, self._model.getDate().addDays(1));
 		swiper.appendSlide(n);
 		
 		swiper.update();
