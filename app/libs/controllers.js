@@ -71,6 +71,7 @@ class WeekController extends Controller {
 		
 		this._view.onEventClick = function(id) {
 			//	on event click
+			console.log(id);
 		} 
 	}
 	
@@ -125,7 +126,6 @@ class WeekController extends Controller {
 				swiper.slideNext();
 			}
 		}
-
 		
 		self._view.didTapPrevWeek = function() {
 			const newDate = self._model.getDate().addDays(-7);
@@ -183,7 +183,7 @@ class WeekController extends Controller {
 }
 
 class Popup extends Controller {
-	constructor(el, name, view, model) {
+	constructor(el, name, view, model, replaceString) {
 		el = document.body;
 		super(el, name, view, model);
 		const self = this;
@@ -194,7 +194,8 @@ class Popup extends Controller {
 		const o = self._overlay = document.createElement("div");
 		o.id = "overlay";
 		o.onclick = function(){
-			window.location.hash = window.location.hash.replace("?ae", "");	// dismisses the controller
+// 			window.location.hash = window.location.hash.replace("?ae", "");	// dismisses the controller
+			window.location.hash = window.location.hash.replace(replaceString, "");
 		}
 		document.body.appendChild(o);
 		
@@ -222,9 +223,23 @@ class Popup extends Controller {
 	}
 }
 
+class ShowEventPopup extends Popup {
+	constructor(el, name, view, model, replaceString) {
+		super(el, name, view, model, replaceString);
+		const self = this;
+		
+		this._queryString;
+	}
+	
+	eventId() {
+		var id = this._queryString.split("=");
+		return id[1];
+	}
+}
+
 class AddEventPopup extends Popup {
-	constructor(el, name, view, model) {
-		super(el, name, view, model);
+	constructor(el, name, view, model, replaceString) {
+		super(el, name, view, model, replaceString);
 		
 		const self = this;
 		

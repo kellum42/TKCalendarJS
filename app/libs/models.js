@@ -146,7 +146,10 @@ class Event {
 		const h = s.getHours();
 		const m = s.getMinutes();
 		const t = 100 * ((h * 60 + m) / 60);
-		return t + "%";
+// 		return t + "%";
+		const p = t + "%";
+		const a = t / 100 + "px";
+		return "calc(" + p + " + " + a + ")";
 	}
 	
 	startTime(){

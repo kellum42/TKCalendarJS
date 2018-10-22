@@ -7,6 +7,7 @@
 		-ms-user-select: none;
 		user-select: none;
 		-webkit-tap-highlight-color: transparent;
+		box-sizing: border-box;
 	}
 	body {
 		overflow: hidden;
@@ -241,7 +242,7 @@
 	.month-expanded > .days > a > .events {
 		display:none;
 	}
-	.month-expanded > .days > a > .events > .event, .week-wrapper .event {
+	.month-expanded > .days > a > .events > .event {
 		padding: 5px 2px;
 		border-radius: 2px;
 		font-size: 13px;
@@ -251,7 +252,7 @@
 		background: purple;
 		color: white;
 	}
-	.month-expanded > .days > a > .events > .event > p, .week-wrapper .event {
+	.month-expanded > .days > a > .events > .event > p, .week-wrapper .event > p {
 		margin: 0px;
 		font-size: 14px;
 		white-space: nowrap;
@@ -356,7 +357,7 @@
 		height: calc(100% - 100px);
 	}
 	.swiper-slide {
-      	overflow-y: scroll;
+/*       	overflow-y: scroll; */
     }
     .week-wrapper {
 		display: none;
@@ -506,7 +507,6 @@
 		width: 50px;
 		left: 0;
 		top: 10px;
-		height: 100%;
 	}
 	.week-wrapper > .week > .week-events-wrapper > .week-events {
 		margin-left: 50px;

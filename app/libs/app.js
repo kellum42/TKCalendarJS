@@ -16,6 +16,7 @@ class App {
 	    this._yearsControllerName = "years-controller";
 	    this._weekControllerName = "week-controller";
 	    this._addEventControllerName = "add-event-controller";
+	    this._showEventControllerName = "show-event-controller";
 	}
 	
 	push(controller){		
@@ -69,7 +70,13 @@ class App {
 		}
 		
 		if (hashData.add_event) {
-			this.push(new AddEventPopup(this._element, this._addEventControllerName, new AddEventView(), model));
+			this.push(new AddEventPopup(this._element, this._addEventControllerName, new AddEventView(), model, "?ae"));
+		}
+		
+		if (hashData.open_event) {
+			const c = new ShowEventPopup(this._element, this._showEventControllerName, new ShowEventView(), model, "?" + hashData.open_event);
+			c._queryString = hashData.open_event;
+			this.push(c);
 		}
 	}
 	
@@ -93,8 +100,11 @@ class App {
 		model._day = hashData.day;
 		
 		if (hashData.add_event){
-			controller = new AddEventPopup(this._element, this._addEventControllerName, new AddEventView(), model);
+			controller = new AddEventPopup(this._element, this._addEventControllerName, new AddEventView(), model, "?ae");
 		
+		} else if (hashData.open_event) {
+			controller = new ShowEventPopup(this._element, this._showEventControllerName, new ShowEventView(), model, "?" + hashData.open_event)
+			
 		} else if (hashData.controller === "week"){
 			controller = new WeekController(this._element, this._weekControllerName , new WeekView(), model);
 		
@@ -110,7 +120,7 @@ class App {
 			month: null,
 			day: null,
 			add_event: false,
-			event_open: false,
+			open_event: false,
 			segment_count: 0,
 			controller: "year"
 		};
@@ -118,6 +128,11 @@ class App {
 		if (hash.match(/\?ae/g)) {
 			obj.add_event = true;
 			hash = hash.split("?")[0];
+		
+		} else if (hash.match(/\?eo/g)) {
+			const comps = hash.split("?");
+			hash = comps[0];
+			obj.open_event = comps[1];
 		}
 		
 		hash = hash || "";
@@ -128,6 +143,7 @@ class App {
 		obj.month = segments[1] || null;
 		obj.day = segments[2] || null;
 		obj.controller = (obj.day ? "week": null) || (obj.month ? "month" : null) || "year";
+		
 		return obj;
 	}
 }

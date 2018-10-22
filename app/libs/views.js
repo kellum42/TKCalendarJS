@@ -111,6 +111,7 @@ class WeekView extends View {
 		super();
 		self.didTapPrevWeek;
 		self.didTapNextWeek;
+		self.onEventClick;
 	}
 	
 	refreshHTML(model) {
@@ -275,6 +276,7 @@ class WeekView extends View {
 	}
 		
 	eventsInHTMLForDate(date, manager, format) {
+		const self = this;
 		var eventsArr = [];	// array to hold the events html 
 		const year = date.getFullYear();
 		const month = date.getMonth();
@@ -287,7 +289,11 @@ class WeekView extends View {
 		for (var i=0;i<events.length;i++) {
 			const event = new Event(events[i]);
 			const eventElement = event.html();
-			eventElement.onclick = this.onEventClick(event._id);
+			eventElement.dataset.id = event._id;
+			
+// 			eventElement.onclick = function(){
+// 				self.onEventClick(event._id);
+// 			}
 						
 			const increments = event.span();
 			for (var j=0;j<increments.length;j++) {
@@ -361,5 +367,14 @@ class AddEventView extends View {
 		button.onclick = function(){
 			return self._onAddEventClicked();
 		}
+	}
+}
+
+class ShowEventView extends View {
+	
+	refreshHTML(model) {
+		const self = this;
+		var html = "<div class='view-content-wrapper' style='background:orange'></div>";
+		self._element.innerHTML = html;
 	}
 }
