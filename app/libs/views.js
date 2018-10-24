@@ -109,6 +109,8 @@ class WeekView extends View {
 	
 	constructor(){
 		super();
+		
+		//	callbacks
 		self.didTapPrevWeek;
 		self.didTapNextWeek;
 		self.onEventClick;
@@ -160,9 +162,7 @@ class WeekView extends View {
 	}
 		
 	//	generate html for both week and day on every swipe/move
-	//	just store them in different wrappers (day vs week)
-	//	store "weekNum" variable in the model (will have to find the weeks of year somehow) 
-	
+	//	just store them in different wrappers (day vs week)	
 	getPageHTML(model, dayDate, weekDate) {
 		const self = this;
 		weekDate = weekDate || dayDate;
@@ -175,6 +175,27 @@ class WeekView extends View {
 		
 		div.appendChild(weekEl);
 		div.appendChild(dayEl);
+		
+		//	set callbacks
+		
+		//	directional arrows event listeners
+		const directions = div.querySelectorAll(".week-info > div > div img");
+		directions[0].onclick = function(){
+			self.didTapPrevWeek();
+		}
+		directions[1].onclick = function(){
+			self.didTapNextWeek();
+		}
+		
+		//	add event click event listeners
+		const events = div.querySelectorAll(".event");
+		for (var i=0;i<events.length;i++) {
+			events[i].onclick = (function(a){
+				return function(){
+					self.onEventClick(this.dataset.id);
+				}
+			}(self))
+		}
 		
 		return div;
 	}
@@ -217,9 +238,9 @@ class WeekView extends View {
 
 			//	populate events
 			const refCell = d.querySelector(".reference-cell");
-			const events = self.eventsInHTMLForDate(cd, model._eventManager, "week");
-			for (var j=0;j<events.length;j++) {
-				refCell.appendChild(events[j]);
+			const es = self.eventsInHTMLForDate(cd, model._eventManager, "week");
+			for (var j=0;j<es.length;j++) {
+				refCell.appendChild(es[j]);
 			}
 			
 			//	the names of the days of the week
@@ -243,15 +264,7 @@ class WeekView extends View {
 		
 		//	set today label
 		div.querySelector(".week-info .today").style.display = isCurrentWeek ? "inline-block" : "none";
-		
-		//	directional arrows event listeners
-		const directions = div.querySelectorAll("img");
-		directions[0].onclick = function(){
-			self.didTapPrevWeek();
-		}
-		directions[1].onclick = function(){
-			self.didTapNextWeek();
-		}
+				
 		return div;
 	}
 	
@@ -291,9 +304,14 @@ class WeekView extends View {
 			const eventElement = event.html();
 			eventElement.dataset.id = event._id;
 			
-// 			eventElement.onclick = function(){
-// 				self.onEventClick(event._id);
-// 			}
+/*
+			eventElement.onclick = (function(a){
+				return function(){
+					console.log(a);
+					self.onEventClick(a);
+				}
+			}(event._id));
+*/
 						
 			const increments = event.span();
 			for (var j=0;j<increments.length;j++) {

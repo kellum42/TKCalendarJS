@@ -261,9 +261,11 @@
 	}
 	.day-wrapper {
 		position: relative;
-		margin-top: 30px;
-/* 		height: 100%; */
+		margin-top: 15px;
+		height: calc(100% - 15px);
 		width: 100%;
+		overflow-y: scroll;
+		padding-top: 10px;
 	}
 	.day-wrapper > .cell {
 		position:relative;

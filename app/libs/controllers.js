@@ -71,7 +71,7 @@ class WeekController extends Controller {
 		
 		this._view.onEventClick = function(id) {
 			//	on event click
-			console.log(id);
+			window.location.hash += "?eo" + id; 
 		} 
 	}
 	
@@ -87,12 +87,15 @@ class WeekController extends Controller {
 		super.load();
 		
 		const self = this;		
+		
 		const div = self._view.getPageHTML(self._model, self._model.getDate());
 		self._view._sliderElement.appendChild(div);
 		
-		const swiper = new Swiper('.swiper-container');
-		swiper.prependSlide(self._view.getPageHTML(self._model, self._model.addDaysToDate(-1)));	// make previous slide
-		swiper.appendSlide(self._view.getPageHTML(self._model, self._model.addDaysToDate(1)));	// make next slide
+		const swiper = new Swiper('.swiper-container', {
+			simulateTouch: false
+		});
+		swiper.prependSlide(self._view.getPageHTML(self._model, self._model.getDate().addDays(-1)));	// make previous slide
+		swiper.appendSlide(self._view.getPageHTML(self._model, self._model.getDate().addDays(1)));	// make next slide
 		swiper.update();
 				
 		//	on swipe gesture - forward slide (can only swipe on days - can't swipe weeks)	
@@ -110,7 +113,6 @@ class WeekController extends Controller {
 		});
 
 		self._view.tappedDateInWeekdayList = function(newDate, direction){
-			
 			self._model.setDate(newDate.addDays( direction === "forward" ? -1 : 1 ));	// account for day added/subtracted in the callback
 			const div = self._view.getPageHTML(self._model, newDate);
 			self.removeAllSlidesExceptActive(swiper);
