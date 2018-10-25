@@ -71,7 +71,7 @@ class WeekController extends Controller {
 		
 		this._view.onEventClick = function(id) {
 			//	on event click
-			window.location.hash += "?eo" + id; 
+			window.location.hash += "?eo=" + id; 
 		} 
 	}
 	
@@ -230,11 +230,14 @@ class ShowEventPopup extends Popup {
 		super(el, name, view, model, replaceString);
 		const self = this;
 		
-		this._queryString;
+		view.event_id = self.eventId();
 	}
 	
+	//	TODO:
+	//	could even move this to a model function
+	//	just gets event name from the equal sign in the hash
 	eventId() {
-		var id = this._queryString.split("=");
+		var id = window.location.hash.split("=");
 		return id[1];
 	}
 }

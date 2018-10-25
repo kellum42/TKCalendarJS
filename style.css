@@ -358,9 +358,6 @@
 	.swiper-container {
 		height: calc(100% - 100px);
 	}
-	.swiper-slide {
-/*       	overflow-y: scroll; */
-    }
     .week-wrapper {
 		display: none;
 		pointer-events: none;
@@ -376,6 +373,43 @@
 		color: #60656f;
 		margin: 0px;
 		line-height: 1.5;
+	}
+	.show-event-controller > .view-content-wrapper {
+		padding: 0px;
+	}
+	.show-event > .top {
+		background: #E64E42;
+		color: white;
+		padding: 100px 10px 10px 10px;
+	}
+	.show-event > .content-body {
+		padding: 10px;
+	}
+	.show-event > .content-body > .row {
+		margin: 20px 0px;
+	}
+	.show-event > .content-body > .row > div {
+		display: inline-block;
+		vertical-align: middle;
+	}
+	.show-event > .content-body > .row > .icon {
+		width: 50px;
+		text-align: center;
+	}
+	.show-event > .content-body > .row > .icon > svg {
+		width: auto;
+		height: 30px;
+		color: #999999;
+	}
+	.show-event > .content-body > .row > .info {
+		margin-left: 15px;
+	}
+	.show-event > .content-body > .row > .info > p {
+		margin: 5px 0px;
+	}
+	.show-event > .content-body > .row > .info p ~ small {
+		color: grey;
+		font-size: 90%;
 	}
 }
 

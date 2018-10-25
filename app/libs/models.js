@@ -54,8 +54,8 @@ class Model {
 		return n;
 	}
 	
-	dateStringFormat(){
-		const d = this.getDate();
+	dateStringFormat(date){
+		const d = date || this.getDate();
 		if (!d) { return ""; }
 		
 		return this._fullWeekDays[d.getDay()] + " " + this._fullMonths[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
@@ -89,6 +89,16 @@ class EventManager {
 	
 	getEvents(){
 		return JSON.parse(this._storage.getItem(this._identifier)) || [];
+	}
+	
+	getEvent(id) {
+		const self = this;
+		const events = self.getEvents();
+		for (var i=0;i<events.length;i++) {
+			if (events[i].id === id) {
+				return events[i];
+			}
+		}
 	}
 	
 	eventsForDay(year, month, day) {

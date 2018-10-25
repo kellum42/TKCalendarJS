@@ -21,7 +21,7 @@ class App {
 	
 	push(controller){		
 		const currentController = this._stack[this._stack.length - 1];
-		if (controller._name !== this._addEventControllerName) {
+		if (controller._name !== this._addEventControllerName && controller._name !== this._showEventControllerName) {
 			currentController._view.hide(); // so it doesn't show under new controller	
 		}
 				

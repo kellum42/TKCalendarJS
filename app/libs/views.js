@@ -392,7 +392,13 @@ class ShowEventView extends View {
 	
 	refreshHTML(model) {
 		const self = this;
-		var html = "<div class='view-content-wrapper' style='background:orange'></div>";
+		const e = model._eventManager.getEvent(self.event_id);	// event_id was set by controller in constructor
+		if (!e) { return; }
+		const event = new Event(e);
+		const dateString = model.dateStringFormat(new Date(event._start));
+		const location = event._location || "TBA";
+		const priority = event._priority || "Low";
+		var html = "<div class='view-content-wrapper'><div class='show-event'><div class='top'><h3>" + event._name + "</h3></div><div class='content-body'><div class='row'><div class='icon'><i class='far fa-clock'></i></div><div class='info'><p>" + dateString + "</p><small>" + event.startTime() + " - " + event.endTime() + "</small></div></div><div class='row'><div class='icon'><i class='fas fa-map-marker-alt'></i></div><div class='info'><p>" + location + "</p></div></div><div class='row'><div class='icon'><i class='fas fa-exclamation'></i></div><div class='info'><p>Priority: " + priority + "</p><small>Not urgent.</small></div></div></div></div></div>";
 		self._element.innerHTML = html;
 	}
 }
