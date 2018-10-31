@@ -10,3 +10,7 @@ Date.prototype.isToday = function() {
 	const today = new Date();
 	return today.getFullYear() === this.getFullYear() && today.getMonth() === this.getMonth() && today.getDate() === this.getDate();
 }
+
+String.prototype.capitalizeFirstLetter = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}

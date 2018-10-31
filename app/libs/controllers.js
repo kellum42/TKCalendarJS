@@ -186,7 +186,7 @@ class WeekController extends Controller {
 
 class Popup extends Controller {
 	constructor(el, name, view, model, replaceString) {
-		el = document.body;
+		el = document.body;	// add popup to document body and not element
 		super(el, name, view, model);
 		const self = this;
 		
@@ -199,10 +199,10 @@ class Popup extends Controller {
 // 			window.location.hash = window.location.hash.replace("?ae", "");	// dismisses the controller
 			window.location.hash = window.location.hash.replace(replaceString, "");
 		}
-		document.body.appendChild(o);
+		el.appendChild(o);
 		
 		setTimeout(function(){
-			self._view._element.style.right = "0px";
+			self._view._element.style.right = "0px";	// show the popup
 		}, 100);
 	}
 	
@@ -231,6 +231,7 @@ class ShowEventPopup extends Popup {
 		const self = this;
 		
 		view.event_id = self.eventId();
+		view._onClose;
 	}
 	
 	//	TODO:
@@ -264,8 +265,10 @@ class AddEventPopup extends Popup {
 					name: self._view._eventName.value,
 					start_date: self._startDatepicker.extractDate(),
 					end_date: self._endDatepicker.extractDate(),
-					description: self._view._eventDescription.value || ""
+					description: self._view._eventDescription.value || "",
+					priority: self._view._eventPriority.value
 				}
+								
 				self._model._eventManager.saveEvent(event);
 				window.location.hash = window.location.hash.replace("?ae", ""); // dismiss the controller
 				

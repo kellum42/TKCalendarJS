@@ -67,6 +67,11 @@ class EventManager {
 	constructor(){
 		this._identifier = "events";
 		this._storage = window.localStorage;
+		this._priorities = {
+			"low": "Not urgent.",
+			"medium": "Needs to get done.",
+			"high": "Needs to be completed right now."
+		};
 	}
 	
 	saveEvent(obj){

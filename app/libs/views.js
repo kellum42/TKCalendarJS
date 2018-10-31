@@ -303,15 +303,7 @@ class WeekView extends View {
 			const event = new Event(events[i]);
 			const eventElement = event.html();
 			eventElement.dataset.id = event._id;
-			
-/*
-			eventElement.onclick = (function(a){
-				return function(){
-					console.log(a);
-					self.onEventClick(a);
-				}
-			}(event._id));
-*/
+			eventElement.classList.add("hover");
 						
 			const increments = event.span();
 			for (var j=0;j<increments.length;j++) {
@@ -373,13 +365,19 @@ class AddEventView extends View {
 		
 	refreshHTML(model) {
 		const self = this;
-		var html = "<div class='view-content-wrapper'><h2>New Event</h2><div><div class='input-group'><p>Name</p><input type='text' id='event-name' /></div><div class='input-group'><p>Start Date</p><input type='text' id='event-start' /></div><div class='input-group'><p>End Date</p><input type='text' id='event-end' /></div><div class='input-group'><p>Description</p><textarea id='add-event-description'></textarea></div></div><div><button type='button' class='button hover'>Add Event</button</div></div>";
+		var html = "<div class='view-content-wrapper'><h2>New Event</h2><div><div class='input-group'><p>Name</p><input type='text' id='event-name' /></div><div class='input-group'><p>Start Date</p><input type='text' id='event-start' /></div><div class='input-group'><p>End Date</p><input type='text' id='event-end' /></div><div class='input-group'><p>Priority</p><select id='event-priority'></select></div><div class='input-group'><p>Description</p><textarea id='add-event-description'></textarea></div></div><div><button type='button' class='button hover'>Add Event</button</div></div>";
 		self._element.innerHTML = html;
 		
 		self._eventName = self._element.querySelector("#event-name");
 		self._eventStart = self._element.querySelector("#event-start");
 		self._eventEnd = self._element.querySelector("#event-end");
 		self._eventDescription = self._element.querySelector("#add-event-description");
+		self._eventPriority = self._element.querySelector("#event-priority");
+
+		for (var key in model._eventManager._priorities) {
+		    if (!model._eventManager._priorities.hasOwnProperty(key)) continue;
+			self._eventPriority.innerHTML += "<option value='" + key + "'>" + key.capitalizeFirstLetter() + "</option>";
+		}
 		
 		const button = self._element.querySelector("button");
 		button.onclick = function(){
@@ -398,7 +396,14 @@ class ShowEventView extends View {
 		const dateString = model.dateStringFormat(new Date(event._start));
 		const location = event._location || "TBA";
 		const priority = event._priority || "Low";
-		var html = "<div class='view-content-wrapper'><div class='show-event'><div class='top'><h3>" + event._name + "</h3></div><div class='content-body'><div class='row'><div class='icon'><i class='far fa-clock'></i></div><div class='info'><p>" + dateString + "</p><small>" + event.startTime() + " - " + event.endTime() + "</small></div></div><div class='row'><div class='icon'><i class='fas fa-map-marker-alt'></i></div><div class='info'><p>" + location + "</p></div></div><div class='row'><div class='icon'><i class='fas fa-exclamation'></i></div><div class='info'><p>Priority: " + priority + "</p><small>Not urgent.</small></div></div></div></div></div>";
+		const priorityDesc = model._eventManager._priorities[priority.toLowerCase()];
+		const description = event._description || "No description.";
+		var html = "<div class='view-content-wrapper'><div class='show-event'><div class='top'><div class='event-icons'><i class='fas fa-trash-alt'></i><i class='fas fa-edit'></i><i class='fas fa-times'></i></div><h3>" + event._name + "</h3></div><div class='content-body'><div class='row'><div class='icon'><i class='far fa-clock'></i></div><div class='info'><p>" + dateString + "</p><small>" + event.startTime() + " - " + event.endTime() + "</small></div></div><div class='row'><div class='icon'><i class='fas fa-map-marker-alt'></i></div><div class='info'><p>" + location + "</p></div></div><div class='row'><div class='icon'><i class='fas fa-exclamation'></i></div><div class='info'><p>Priority: " + priority + "</p><small>" + priorityDesc + "</small></div></div><div class='row'><div class='icon'><i class='fas fa-list-alt'></i></div><div class='info'><p>" + description + "</p></div></div></div></div></div>";
 		self._element.innerHTML = html;
+		
+		self._element.querySelector(".fa-times").onclick = function(){
+				console.log('will be closing now');
+			}
+		}
 	}
 }
